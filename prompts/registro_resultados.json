@@ -1,0 +1,99 @@
+{
+  "modelo": "gemini-3.5-flash-lite",
+  "repeticiones": 3,
+  "prompts": {
+    "clasificar_consulta": {
+      "exitos": 3,
+      "total": 3,
+      "corridas": [
+        {
+          "corrida": 1,
+          "ok": true,
+          "datos": {
+            "tipo": "ambos",
+            "confianza": 1.0
+          }
+        },
+        {
+          "corrida": 2,
+          "ok": true,
+          "datos": {
+            "tipo": "ambos",
+            "confianza": 1.0
+          }
+        },
+        {
+          "corrida": 3,
+          "ok": true,
+          "datos": {
+            "tipo": "fuera_de_alcance",
+            "confianza": 1
+          }
+        }
+      ]
+    },
+    "extraer_filtros": {
+      "exitos": 3,
+      "total": 3,
+      "corridas": [
+        {
+          "corrida": 1,
+          "ok": true,
+          "datos": {
+            "grupo": "2°B",
+            "umbral_nota": 4.0,
+            "umbral_asistencia": 85.0
+          }
+        },
+        {
+          "corrida": 2,
+          "ok": true,
+          "datos": {
+            "grupo": "2°B",
+            "umbral_nota": 4.0,
+            "umbral_asistencia": 85
+          }
+        },
+        {
+          "corrida": 3,
+          "ok": true,
+          "datos": {
+            "grupo": "2°B",
+            "umbral_nota": 4.0,
+            "umbral_asistencia": 85.0
+          }
+        }
+      ]
+    },
+    "responder_con_contexto": {
+      "exitos": 3,
+      "total": 3,
+      "corridas": [
+        {
+          "corrida": 1,
+          "ok": true,
+          "datos": {
+            "respuesta": "El estudiante con promedio bajo 4.0 y asistencia menor a 85% es Diego Soto.",
+            "encontrado": true
+          }
+        },
+        {
+          "corrida": 2,
+          "ok": true,
+          "datos": {
+            "respuesta": "Diego Soto tiene notas con promedio bajo 4.0 y una asistencia del 72%, menor a 85%.",
+            "encontrado": true
+          }
+        },
+        {
+          "corrida": 3,
+          "ok": true,
+          "datos": {
+            "respuesta": "El estudiante Diego Soto tiene promedio bajo 4.0 y asistencia menor a 85%.",
+            "encontrado": true
+          }
+        }
+      ]
+    }
+  }
+}
