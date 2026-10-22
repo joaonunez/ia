@@ -20,6 +20,7 @@ def build_request(
     question: str,
     model: str,
     system_instruction: str | None = None,
+    response_schema: dict | None = None,
 ) -> tuple[str, dict, dict]:
     if not question or not question.strip():
         raise ValueError("La pregunta no puede estar vacía")
@@ -48,6 +49,11 @@ def build_request(
     }
     if instruction.strip():
         body["systemInstruction"] = {"parts": [{"text": instruction.strip()}]}
+    if response_schema:
+        body["generationConfig"] = {
+            "responseMimeType": "application/json",
+            "responseSchema": response_schema,
+        }
     return url, headers, body
 
 
