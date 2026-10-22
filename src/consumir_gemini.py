@@ -5,8 +5,22 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# Cómo actúa el asistente. Va en systemInstruction, aparte de la pregunta y del contexto.
+SYSTEM_INSTRUCTION = (
+    "Eres el asistente de solo lectura del gestor académico de la intranet escolar. "
+    "Respondes en español y en pocas frases. "
+    "Usas únicamente el JSON de contexto que acompaña la pregunta. "
+    "No inventas alumnos, notas, asistencia, cursos ni promedios. "
+    "No propones crear, editar ni borrar datos. "
+    "Si el dato no está en el contexto, dices que no lo tienes."
+)
 
-def build_request(question: str, model: str) -> tuple[str, dict, dict]:
+
+def build_request(
+    question: str,
+    model: str,
+    system_instruction: str | None = None,
+) -> tuple[str, dict, dict]:
     if not question or not question.strip():
         raise ValueError("La pregunta no puede estar vacía")
 
@@ -20,7 +34,8 @@ def build_request(question: str, model: str) -> tuple[str, dict, dict]:
         "x-goog-api-key": api_key,
         "Content-Type": "application/json",
     }
-    body = {
+    instruction = SYSTEM_INSTRUCTION if system_instruction is None else system_instruction
+    body: dict = {
         "contents": [
             {
                 "parts": [
@@ -31,6 +46,8 @@ def build_request(question: str, model: str) -> tuple[str, dict, dict]:
             }
         ]
     }
+    if instruction.strip():
+        body["systemInstruction"] = {"parts": [{"text": instruction.strip()}]}
     return url, headers, body
 
 
@@ -59,6 +76,22 @@ def extract_text(data: dict) -> str:
         raise RuntimeError(
             "La respuesta no trae el texto generado en el lugar esperado."
         )
+
+
+def calculate_cost(data: dict, input_price: float, output_price: float) -> float:
+    """Calcula el costo en USD de una respuesta usando usageMetadata.
+
+    input_price y output_price son precios en USD por token.
+    """
+    try:
+        usage = data["usageMetadata"]
+        input_tokens = usage["promptTokenCount"]
+        output_tokens = usage["candidatesTokenCount"]
+    except KeyError:
+        raise RuntimeError(
+            "La respuesta no trae usageMetadata con el conteo de tokens esperado."
+        )
+    return input_tokens * input_price + output_tokens * output_price
 
 
 def get_generated_text(question: str, model: str) -> str:

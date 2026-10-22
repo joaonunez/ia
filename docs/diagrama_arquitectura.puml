@@ -1,0 +1,50 @@
+@startuml
+title Arquitectura: asistente IA del gestor académico\nContexto en API · microservicio IA · Gemini · user <<reader>>
+
+skinparam shadowing false
+skinparam defaultFontSize 12
+skinparam packageStyle rectangle
+skinparam ArrowColor #2C3E50
+top to bottom direction
+
+actor "Gestor académico" as gestor
+
+rectangle "1 · Portal\n====\nportal-intranet\nchat del asistente" as portal #D5F5E3
+
+rectangle "2 · API intranet\n====\napi-intranet NestJS\nauth + alcance sede/rol\n----\nArmado de contexto:\nconsulta DB con user <<reader>>\narma JSON de contexto\nllama al microservicio IA" as api #D6EAF8
+
+database "3 · PostgreSQL\n====\nuser <<reader>>\n----\nacademic.students\nacademic.student_enrollments\nacademic.establishment_level_sections\nattendance.schedule_attendance_sessions\nattendance.schedule_attendance_records\nassessment.evaluations\nassessment.student_evaluation_results\nassessment.period_student_subject_summary" as db #FCF3CF
+
+rectangle "4 · Microservicio IA\n====\n.env GEMINI_API_KEY\n(sin credenciales de DB)\n----\nbuild_request\nsend_request\nextract_text\ncalculate_cost" as ia #FADBD8
+
+rectangle "4b · systemInstruction\n====\ncómo actúa el asistente\n----\nSolo lectura del gestor académico.\nEspañol, pocas frases.\nSolo el JSON de contexto.\nNo inventa alumnos, notas,\nasistencia, cursos ni promedios.\nNo propone crear, editar ni borrar.\nSi el dato no está, lo dice." as sys #F5EEF8
+
+cloud "5 · Gemini\ngemini-3.5-flash-lite\ngenerateContent" as gemini #E8DAEF
+
+gestor -down-> portal : pregunta
+portal -down-> api : HTTP + sesión
+api -down-> db : SELECT\n<<reader>>
+db -up-> api : filas → contexto JSON
+api -down-> ia : pregunta + contexto + modelo
+ia -down-> sys : build_request\nla mete en el body
+sys -down-> gemini : POST JSON\ncontents + systemInstruction\n+ x-goog-api-key
+gemini -up-> ia : JSON
+ia -up-> api : texto + costo USD
+api -up-> portal : respuesta
+portal -up-> gestor : muestra texto
+
+note as N
+  Contexto = datos ya filtrados por sede/rol.
+  El microservicio IA no consulta la DB:
+  genera con el contexto que le entrega la API.
+  systemInstruction vive en el microservicio
+  (no la escribe el gestor ni va en el browser).
+  La key de Gemini vive en el microservicio.
+  El user de PostgreSQL vive en la API
+  (armado de contexto).
+end note
+
+N .. api
+N .. ia
+N .. sys
+@enduml

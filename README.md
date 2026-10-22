@@ -1,5 +1,7 @@
 # Proyecto gradual de Joao Nunez — Especialización en Desarrollo con IA Generativa (Accenture)
 
+Repositorio: https://github.com/joaonunez/ia
+
 Esta es la estructura base que vas a usar como punto de partida para tu proyecto en este programa. Es la misma estructura que vas a ir ampliando bloque a bloque, hasta llegar a la aplicación completa que entregas en el Gate 3.
 
 ## Cómo empezar
