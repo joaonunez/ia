@@ -51,6 +51,7 @@ def with_retry(
     attempts: int = 3,
     base_wait_seconds: float = 2,
     max_wait_seconds: float = 30,
+    waits: list[float] | None = None,
 ) -> Any:
     """Reintenta solo TimeoutError. ValueError pasa de inmediato.
 
@@ -69,6 +70,8 @@ def with_retry(
                 f"Intento {attempt} de {attempts} falló. "
                 f"Reintentando en {wait_with_jitter:.1f}s..."
             )
+            if waits is not None:
+                waits.append(wait_with_jitter)
             time.sleep(wait_with_jitter)
 
 
@@ -91,6 +94,7 @@ def ask_model(
     question: str,
     system_instruction: str | None = None,
     model: str = DEFAULT_MODEL,
+    waits: list[float] | None = None,
 ) -> str:
     """Pregunta al modelo, reintenta lo momentáneo y devuelve el texto.
 
@@ -99,7 +103,7 @@ def ask_model(
     """
     url, headers, body = build_request(question, model, system_instruction)
     try:
-        response = with_retry(lambda: post_generation(url, headers, body))
+        response = with_retry(lambda: post_generation(url, headers, body), waits=waits)
     except TimeoutError:
         raise RuntimeError(
             "El servicio no respondió tras varios intentos. Intenta más tarde."
