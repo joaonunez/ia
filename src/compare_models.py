@@ -8,7 +8,7 @@ import json
 import time
 from pathlib import Path
 
-from consumir_gemini import build_request, calculate_cost, extract_text, send_request
+from gemini_api import build_request, calculate_cost, extract_text, send_request
 
 # Precios en USD por token (precio por 1M tokens / 1_000_000)
 MODELS: dict[str, dict[str, float]] = {

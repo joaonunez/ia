@@ -13,20 +13,20 @@ BASE = (
     "Si el dato no está, lo dices."
 )
 
-BANCO_DE_PROMPTS = [
+PROMPT_BANK = [
     {
-        "nombre": "clasificar_consulta",
+        "name": "clasificar_consulta",
         "system_instruction": (
             BASE
             + " Responde únicamente con un JSON, sin markdown. "
             "Claves: 'tipo' (notas, asistencia, ambos o fuera_de_alcance) "
             "y 'confianza' (número entre 0 y 1)."
         ),
-        "ejemplo_usuario": (
+        "user_example": (
             "¿Qué estudiante de 2°B tiene promedio bajo 4.0 "
             "y asistencia menor a 85%?"
         ),
-        "claves_esperadas": ["tipo", "confianza"],
+        "expected_keys": ["tipo", "confianza"],
         "response_schema": {
             "type": "OBJECT",
             "properties": {
@@ -37,18 +37,18 @@ BANCO_DE_PROMPTS = [
         },
     },
     {
-        "nombre": "extraer_filtros",
+        "name": "extraer_filtros",
         "system_instruction": (
             BASE
             + " Responde únicamente con un JSON, sin markdown. "
             "Claves: 'grupo' (string), 'umbral_nota' (número) "
             "y 'umbral_asistencia' (número, en porcentaje)."
         ),
-        "ejemplo_usuario": (
+        "user_example": (
             "¿Qué estudiante de 2°B tiene promedio bajo 4.0 "
             "y asistencia menor a 85%?"
         ),
-        "claves_esperadas": ["grupo", "umbral_nota", "umbral_asistencia"],
+        "expected_keys": ["grupo", "umbral_nota", "umbral_asistencia"],
         "response_schema": {
             "type": "OBJECT",
             "properties": {
@@ -60,14 +60,14 @@ BANCO_DE_PROMPTS = [
         },
     },
     {
-        "nombre": "responder_con_contexto",
+        "name": "responder_con_contexto",
         "system_instruction": (
             BASE
             + " Responde únicamente con un JSON, sin markdown. "
             "Claves: 'respuesta' (string, una o dos frases) "
             "y 'encontrado' (true si el dato estaba en el contexto, si no false)."
         ),
-        "ejemplo_usuario": (
+        "user_example": (
             "Contexto de 2°B, Matemáticas, nota de aprobación 4.0:\n"
             "- Ana Rojas: notas 6.1, 5.8, 6.4; asistencia 95%\n"
             "- Diego Soto: notas 3.5, 4.1, 3.6; asistencia 72%\n"
@@ -76,7 +76,7 @@ BANCO_DE_PROMPTS = [
             "Pregunta: ¿qué estudiante tiene promedio bajo 4.0 "
             "y asistencia menor a 85%?"
         ),
-        "claves_esperadas": ["respuesta", "encontrado"],
+        "expected_keys": ["respuesta", "encontrado"],
         "response_schema": {
             "type": "OBJECT",
             "properties": {

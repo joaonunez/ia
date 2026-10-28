@@ -4,6 +4,10 @@ Repositorio: https://github.com/joaonunez/ia
 
 Esta es la estructura base que vas a usar como punto de partida para tu proyecto en este programa. Es la misma estructura que vas a ir ampliando bloque a bloque, hasta llegar a la aplicación completa que entregas en el Gate 3.
 
+## Idioma del código
+
+Archivos, funciones y variables van en inglés. Comentarios, mensajes y la instrucción del modelo van en español. El detalle está en [`docs/idioma-del-codigo.md`](docs/idioma-del-codigo.md).
+
 ## Cómo empezar
 
 Estos pasos se completan de forma progresiva a lo largo de la Unidad U1.2, no todos el mismo día:

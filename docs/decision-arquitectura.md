@@ -1,6 +1,6 @@
 # Decisión de arquitectura: modelo para el asistente del gestor académico
 
-Proyecto: asistente IA de **solo lectura** para el rol *gestor académico* de la intranet escolar (consultas en lenguaje natural sobre notas, asistencia y cursos), consumiendo la API Gemini desde `src/consumir_gemini.py`.
+Proyecto: asistente IA de **solo lectura** para el rol *gestor académico* de la intranet escolar (consultas en lenguaje natural sobre notas, asistencia y cursos), consumiendo la API Gemini desde `src/gemini_api.py`.
 
 ## Modelo elegido
 
@@ -18,7 +18,7 @@ Flujo: el gestor pregunta en el portal → `api-intranet` acota sede y rol, cons
 
 ## Comparación de candidatos
 
-Prueba: `src/comparar_modelos.py`, ejecutado el 21-10-2026 (hora de Chile, UTC-3) desde el PC del desarrollador. Se envió 4 veces **el mismo prompt** a cada modelo: una pregunta de gestor académico con datos ficticios de 4 estudiantes de 2°B («¿qué estudiante tiene promedio bajo 4.0 y asistencia menor a 85%?»). La respuesta correcta es **Diego Soto, promedio 3.7, asistencia 72%**. Los datos completos por petición están en [`resultados-comparacion.json`](resultados-comparacion.json).
+Prueba: `src/compare_models.py`, ejecutado el 21-10-2026 (hora de Chile, UTC-3) desde el PC del desarrollador. Se envió 4 veces **el mismo prompt** a cada modelo: una pregunta de gestor académico con datos ficticios de 4 estudiantes de 2°B («¿qué estudiante tiene promedio bajo 4.0 y asistencia menor a 85%?»). La respuesta correcta es **Diego Soto, promedio 3.7, asistencia 72%**. Los datos completos por petición están en [`resultados-comparacion.json`](resultados-comparacion.json).
 
 Precios: [página oficial de precios de la API Gemini](https://ai.google.dev/gemini-api/docs/pricing), nivel Standard pagado, texto. Consultada el 21-10-2026; la página indica «Last updated 2026-10-19 UTC». Los precios de `gemini-3.8-flash` son promocionales y valen hasta el 31-12-2026 (desde el 01-01-2027 suben a USD 1,50 / 7,50).
 
