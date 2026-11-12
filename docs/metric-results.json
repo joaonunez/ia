@@ -1,0 +1,202 @@
+[
+  {
+    "question": "¿Qué es Python?",
+    "reference": "Python es un lenguaje de programación interpretado.",
+    "answer": "Python es un lenguaje de programación de alto nivel, interpretado y de propósito general, muy valorado por su sintaxis clara y su facilidad de lectura.",
+    "raw_overlap": 0.8571,
+    "processed_overlap": 1.0,
+    "precision": 0.28,
+    "recall": 1.0,
+    "f1": 0.4375
+  },
+  {
+    "question": "¿Cuándo se creó Python?",
+    "reference": "Python fue creado en 1991.",
+    "answer": "Python fue creado oficialmente en febrero de 1991 por Guido van Rossum.",
+    "raw_overlap": 0.8,
+    "processed_overlap": 1.0,
+    "precision": 0.4167,
+    "recall": 1.0,
+    "f1": 0.5882
+  },
+  {
+    "question": "¿Qué es una lista en Python?",
+    "reference": "Una lista es una colección ordenada y modificable.",
+    "answer": "Una lista en Python es una estructura de datos ordenada y mutable que permite almacenar una colección de elementos de cualquier tipo.",
+    "raw_overlap": 0.875,
+    "processed_overlap": 0.8571,
+    "precision": 0.3182,
+    "recall": 0.875,
+    "f1": 0.4667
+  },
+  {
+    "question": "¿Quién creó Python?",
+    "reference": "Python fue creado por Guido van Rossum.",
+    "answer": "Python fue creado por Guido van Rossum a finales de los años ochenta.",
+    "raw_overlap": 0.8571,
+    "processed_overlap": 1.0,
+    "precision": 0.5385,
+    "recall": 1.0,
+    "f1": 0.7
+  },
+  {
+    "question": "¿Python es un lenguaje compilado?",
+    "reference": "Python no es un lenguaje compilado.",
+    "answer": "Python es un lenguaje interpretado, ya que su código se traduce a bytecode y se ejecuta línea por línea mediante una máquina virtual.",
+    "raw_overlap": 0.6667,
+    "processed_overlap": 0.6667,
+    "precision": 0.1739,
+    "recall": 0.6667,
+    "f1": 0.2759
+  },
+  {
+    "question": "¿Qué es una variable?",
+    "reference": "Una variable es un nombre que guarda un valor.",
+    "answer": "Una variable es un espacio de almacenamiento en la memoria que contiene un valor capaz de cambiar durante la ejecución de un programa.",
+    "raw_overlap": 0.625,
+    "processed_overlap": 0.75,
+    "precision": 0.3043,
+    "recall": 0.7778,
+    "f1": 0.4375
+  },
+  {
+    "question": "¿Qué es un bucle for?",
+    "reference": "Un bucle for repite un bloque para cada elemento de una secuencia.",
+    "answer": "Un bucle for es una estructura de control en programación que permite repetir un bloque de código un número determinado de veces.",
+    "raw_overlap": 0.5833,
+    "processed_overlap": 0.5455,
+    "precision": 0.3182,
+    "recall": 0.5833,
+    "f1": 0.4118
+  },
+  {
+    "question": "¿Qué es una función?",
+    "reference": "Una función es un bloque de código reutilizable.",
+    "answer": "Una función es una relación matemática que asigna a cada elemento de un conjunto de entrada exactamente un elemento de un conjunto de salida.",
+    "raw_overlap": 0.625,
+    "processed_overlap": 0.625,
+    "precision": 0.2083,
+    "recall": 0.625,
+    "f1": 0.3125
+  },
+  {
+    "question": "¿Qué significa el código HTTP 429?",
+    "reference": "El código 429 indica que se superó el límite de uso.",
+    "answer": "El código HTTP 429 significa \"Demasiadas solicitudes\" e indica que el usuario ha enviado demasiadas peticiones en un período de tiempo determinado y ha superado el límite establecido por el servidor.",
+    "raw_overlap": 0.7273,
+    "processed_overlap": 0.7,
+    "precision": 0.2581,
+    "recall": 0.7273,
+    "f1": 0.381
+  },
+  {
+    "question": "¿Qué significa el código HTTP 401?",
+    "reference": "El código 401 indica que la credencial es inválida.",
+    "answer": "El código HTTP 401 significa que la solicitud no ha sido autorizada porque falta o es inválida la autenticación del usuario.",
+    "raw_overlap": 0.6667,
+    "processed_overlap": 0.7778,
+    "precision": 0.3333,
+    "recall": 0.7778,
+    "f1": 0.4667
+  },
+  {
+    "question": "¿Cuánto es 2 más 2?",
+    "reference": "2 más 2 es 4.",
+    "answer": "Dos más dos es cuatro.",
+    "raw_overlap": 0.5,
+    "processed_overlap": 0.5,
+    "precision": 0.4,
+    "recall": 0.4,
+    "f1": 0.4
+  },
+  {
+    "question": "¿En qué año declaró Chile su independencia?",
+    "reference": "Chile declaró su independencia en 1810.",
+    "answer": "Chile declaró su independencia en el año 1818.",
+    "raw_overlap": 0.8333,
+    "processed_overlap": 0.8333,
+    "precision": 0.625,
+    "recall": 0.8333,
+    "f1": 0.7143
+  },
+  {
+    "question": "¿Qué es Git?",
+    "reference": "Git es un sistema de control de versiones.",
+    "answer": "Git es un sistema de control de versiones distribuido que permite registrar los cambios en el código fuente y facilitar el trabajo colaborativo en el desarrollo de software.",
+    "raw_overlap": 0.8571,
+    "processed_overlap": 1.0,
+    "precision": 0.2857,
+    "recall": 1.0,
+    "f1": 0.4444
+  },
+  {
+    "question": "¿Qué es un token en un modelo de lenguaje?",
+    "reference": "Un token es una pieza de texto que el modelo procesa.",
+    "answer": "Un token en un modelo de lenguaje es la unidad mínima de texto, como una palabra, parte de ella o un signo de puntuación, en la que se divide la información para que la inteligencia artificial pueda procesarla.",
+    "raw_overlap": 0.6364,
+    "processed_overlap": 0.7273,
+    "precision": 0.2105,
+    "recall": 0.7273,
+    "f1": 0.3265
+  },
+  {
+    "question": "¿Qué es JSON?",
+    "reference": "JSON es un formato de texto para objetos y listas.",
+    "answer": "JSON es un formato ligero de intercambio de datos basado en texto que es fácil de leer y escribir para los humanos, y fácil de interpretar y generar para las máquinas.",
+    "raw_overlap": 0.8,
+    "processed_overlap": 0.8,
+    "precision": 0.2581,
+    "recall": 0.8,
+    "f1": 0.3902
+  },
+  {
+    "question": "¿De qué color es el cielo despejado?",
+    "reference": "El cielo despejado es azul.",
+    "answer": "El cielo despejado es de color azul.",
+    "raw_overlap": 1.0,
+    "processed_overlap": 1.0,
+    "precision": 0.7143,
+    "recall": 1.0,
+    "f1": 0.8333
+  },
+  {
+    "question": "¿Un auto veloz es lo mismo que un vehículo rápido?",
+    "reference": "Un auto veloz es un vehículo rápido.",
+    "answer": "Sí, un auto veloz y un vehículo rápido son esencialmente lo mismo porque ambos términos describen una capacidad alta de desplazamiento en poco tiempo.",
+    "raw_overlap": 0.5714,
+    "processed_overlap": 0.8333,
+    "precision": 0.25,
+    "recall": 0.8571,
+    "f1": 0.3871
+  },
+  {
+    "question": "¿Cuántos días tiene una semana?",
+    "reference": "Una semana tiene 7 días.",
+    "answer": "Una semana tiene siete días.",
+    "raw_overlap": 0.8,
+    "processed_overlap": 0.8,
+    "precision": 0.8,
+    "recall": 0.8,
+    "f1": 0.8
+  },
+  {
+    "question": "¿Qué es pytest?",
+    "reference": "pytest es una herramienta para correr pruebas en Python.",
+    "answer": "Pytest es un popular marco de trabajo de código abierto para el lenguaje de programación Python que facilita la escritura y ejecución de pruebas de código simples y escalables.",
+    "raw_overlap": 0.3333,
+    "processed_overlap": 0.5556,
+    "precision": 0.1724,
+    "recall": 0.5556,
+    "f1": 0.2632
+  },
+  {
+    "question": "¿Qué es una API?",
+    "reference": "Una API es una interfaz para que un programa hable con otro.",
+    "answer": "Una API es un conjunto de reglas y protocolos que permite que diferentes aplicaciones de software se comuniquen e intercambien datos entre sí.",
+    "raw_overlap": 0.4167,
+    "processed_overlap": 0.4545,
+    "precision": 0.2174,
+    "recall": 0.4167,
+    "f1": 0.2857
+  }
+]

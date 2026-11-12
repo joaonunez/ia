@@ -1,0 +1,72 @@
+{
+  "date": "2026-10-28T19:15:39",
+  "calls_requested": 10,
+  "question": "Di solo: ok",
+  "first_retry_on_call": null,
+  "stopped_on_credentials": false,
+  "all_ok": true,
+  "session_cost_usd": 3.700000000000001e-05,
+  "calls": [
+    {
+      "call": 1,
+      "ok": true,
+      "waits_s": [],
+      "text": "ok"
+    },
+    {
+      "call": 2,
+      "ok": true,
+      "waits_s": [],
+      "text": "ok"
+    },
+    {
+      "call": 3,
+      "ok": true,
+      "waits_s": [],
+      "text": "ok"
+    },
+    {
+      "call": 4,
+      "ok": true,
+      "waits_s": [],
+      "text": "ok"
+    },
+    {
+      "call": 5,
+      "ok": true,
+      "waits_s": [],
+      "text": "ok"
+    },
+    {
+      "call": 6,
+      "ok": true,
+      "waits_s": [],
+      "text": "ok"
+    },
+    {
+      "call": 7,
+      "ok": true,
+      "waits_s": [],
+      "text": "Ok"
+    },
+    {
+      "call": 8,
+      "ok": true,
+      "waits_s": [],
+      "text": "ok"
+    },
+    {
+      "call": 9,
+      "ok": true,
+      "waits_s": [],
+      "text": "ok"
+    },
+    {
+      "call": 10,
+      "ok": true,
+      "waits_s": [],
+      "text": "ok"
+    }
+  ],
+  "note": "Una espera significa 429, un 5xx o un corte de red. El cliente ya tradujo el código antes de llegar aquí."
+}

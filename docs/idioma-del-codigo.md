@@ -22,7 +22,12 @@ Decisión del 2026-10-28. El fuente del proyecto va en inglés para que los nomb
 | `prompts/test_consistencia.py` | `prompts/consistency_check.py` |
 | — | `src/client.py` |
 | — | `src/rate_limit_drill.py` |
+| — | `src/text_pipeline.py` |
+| — | `src/text_metrics.py` |
+| — | `src/evaluate_outputs.py` |
+| `revision_manual.py` | `src/manual_review.py` |
 | — | `tests/test_client.py` |
+| — | `tests/test_text_pipeline.py` |
 
 `prompts/registro_resultados.json` conserva el nombre: es la evidencia de la corrida del banco, no código.
 
