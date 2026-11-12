@@ -26,8 +26,10 @@ Decisión del 2026-10-28. El fuente del proyecto va en inglés para que los nomb
 | — | `src/text_metrics.py` |
 | — | `src/evaluate_outputs.py` |
 | `revision_manual.py` | `src/manual_review.py` |
+| `enrutamiento.py` | `src/routing.py` |
 | — | `tests/test_client.py` |
 | — | `tests/test_text_pipeline.py` |
+| `test_orquestacion.py` | `tests/test_orchestration.py` |
 
 `prompts/registro_resultados.json` conserva el nombre: es la evidencia de la corrida del banco, no código.
 

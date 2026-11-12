@@ -2,7 +2,29 @@
 
 Repositorio: https://github.com/joaonunez/ia
 
-Esta es la estructura base que vas a usar como punto de partida para tu proyecto en este programa. Es la misma estructura que vas a ir ampliando bloque a bloque, hasta llegar a la aplicación completa que entregas en el Gate 3.
+Asistente IA de **solo lectura** para el gestor académico de una intranet escolar: responde consultas en lenguaje natural sobre notas y asistencia usando la API de Gemini (`gemini-3.5-flash-lite`, elegido en [`docs/decision-arquitectura.md`](docs/decision-arquitectura.md)).
+
+## Qué hay hecho
+
+| Unidad | Qué | Dónde |
+| --- | --- | --- |
+| U1.2–U1.3 | Primera petición autenticada, módulo de consumo y excepciones | `src/gemini_api.py` |
+| U1.4 | Arquitectura y comparación de modelos | `docs/decision-arquitectura.md`, `src/compare_models.py` |
+| U1.5 | Banco de prompts y prueba de consistencia | `prompts/` |
+| U2.1 | Cliente modular con reintentos, costo y pruebas | `src/client.py`, `tests/test_client.py` |
+| U2.2 | Pipeline de texto, métricas y límites | `src/text_pipeline.py`, `src/text_metrics.py`, `docs/metric-limits.md` |
+| U2.3 | Chain orquestada con LangChain: clasificar, bifurcar, revisar y manejar fallos | `src/routing.py`, `docs/orchestration.md` |
+
+## Cómo correrlo
+
+```bash
+python -m venv venv
+pip install -r requirements.txt
+python -m pytest
+python src/routing.py
+```
+
+Las pruebas no llaman al proveedor. `src/routing.py` sí: necesita `API_KEY` en el `.env` y hace nueve llamadas reales.
 
 ## Idioma del código
 
