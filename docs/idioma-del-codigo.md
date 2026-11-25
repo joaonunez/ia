@@ -30,6 +30,11 @@ Decisión del 2026-10-28. El fuente del proyecto va en inglés para que los nomb
 | — | `tests/test_client.py` |
 | — | `tests/test_text_pipeline.py` |
 | `test_orquestacion.py` | `tests/test_orchestration.py` |
+| `agente_con_herramientas.py` | `src/agent.py` |
+| — | `src/supervision.py` |
+| — | `tests/test_agent.py` |
+| — | `tests/test_supervision.py` |
+| `limites_autonomia_agente.md` | `docs/agent-autonomy-limits.md` |
 
 `prompts/registro_resultados.json` conserva el nombre: es la evidencia de la corrida del banco, no código.
 

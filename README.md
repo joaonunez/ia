@@ -14,6 +14,7 @@ Asistente IA de **solo lectura** para el gestor académico de una intranet escol
 | U2.1 | Cliente modular con reintentos, costo y pruebas | `src/client.py`, `tests/test_client.py` |
 | U2.2 | Pipeline de texto, métricas y límites | `src/text_pipeline.py`, `src/text_metrics.py`, `docs/metric-limits.md` |
 | U2.3 | Chain orquestada con LangChain: clasificar, bifurcar, revisar y manejar fallos | `src/routing.py`, `docs/orchestration.md` |
+| U2.4 | Agente con tres herramientas, memoria por sesión, aprobación humana y trazas | `src/agent.py`, `src/supervision.py`, `docs/agents.md`, `docs/agent-autonomy-limits.md` |
 
 ## Cómo correrlo
 
@@ -22,9 +23,10 @@ python -m venv venv
 pip install -r requirements.txt
 python -m pytest
 python src/routing.py
+python src/agent.py
 ```
 
-Las pruebas no llaman al proveedor. `src/routing.py` sí: necesita `API_KEY` en el `.env` y hace nueve llamadas reales.
+Las pruebas no llaman al proveedor. `src/routing.py` y `src/agent.py` sí: necesitan `API_KEY` en el `.env`. `routing.py` hace nueve llamadas reales; `agent.py` hace unas doce y se detiene a pedir tu aprobación (`s`/`n`) antes de enviar el aviso simulado al apoderado.
 
 ## Idioma del código
 
