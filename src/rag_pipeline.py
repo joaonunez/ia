@@ -18,6 +18,14 @@ from typing import Any
 from langchain_core.documents import Document
 
 from client import DEFAULT_MODEL, INPUT_USD_PER_TOKEN, OUTPUT_USD_PER_TOKEN
+from observability_security import (
+    ALL_DOCS_DISCARDED_REPLY,
+    BLOCKED_QUESTION_REPLY,
+    detect_injection,
+    new_trace_id,
+    text_fingerprint,
+    trace_id_var,
+)
 from rag_evaluator import EVALUATION_CASES, compare_k_values, evaluate_retrieval
 from rag_indexer import (
     DEFAULT_PERSIST_DIR,
@@ -120,76 +128,187 @@ def answer_with_rag(
     vectorstore,
     model,
     k: int = 3,
+    event_logger: logging.Logger | None = None,
 ) -> dict[str, Any]:
-    """Ejecuta el flujo RAG end-to-end y devuelve respuesta, citas, latencia y costo."""
-    if not isinstance(question, str) or not question.strip():
-        return {
-            "question": question,
-            "answer": EMPTY_QUESTION_REPLY,
-            "citations": {},
-            "retrieved_ids": [],
-            "retrieval_latency_ms": 0.0,
-            "generation_latency_ms": 0.0,
-            "total_latency_ms": 0.0,
-            "embedding_tokens": 0,
-            "input_tokens": 0,
-            "output_tokens": 0,
-            "estimated_cost_usd": 0.0,
-            "error": None,
-        }
-
-    total_start = time.perf_counter()
-    retriever = vectorstore.as_retriever(search_kwargs={"k": k})
+    """Ejecuta el flujo RAG end-to-end con trace_id, filtro anti-inyección, latencia y costo."""
+    current_trace = new_trace_id()
+    token = trace_id_var.set(current_trace)
 
     try:
-        retrieval_start = time.perf_counter()
-        chunks = retriever.invoke(question)
-        retrieval_ms = (time.perf_counter() - retrieval_start) * 1000.0
+        if not isinstance(question, str) or not question.strip():
+            return {
+                "trace_id": current_trace,
+                "question": question,
+                "answer": EMPTY_QUESTION_REPLY,
+                "citations": {},
+                "retrieved_ids": [],
+                "blocked": False,
+                "discarded_sources": [],
+                "retrieval_latency_ms": 0.0,
+                "generation_latency_ms": 0.0,
+                "total_latency_ms": 0.0,
+                "embedding_tokens": 0,
+                "input_tokens": 0,
+                "output_tokens": 0,
+                "estimated_cost_usd": 0.0,
+                "error": None,
+            }
 
-        prompt, citations = build_rag_prompt(question, chunks)
+        if event_logger is not None:
+            event_logger.info(
+                "rag_consulta_iniciada",
+                extra={
+                    "extra_data": {
+                        "longitud_pregunta": len(question),
+                        "huella_pregunta": text_fingerprint(question),
+                        "k": k,
+                    }
+                },
+            )
 
-        generation_start = time.perf_counter()
-        response = model.invoke(prompt)
-        generation_ms = (time.perf_counter() - generation_start) * 1000.0
+        question_rules = detect_injection(question)
+        if question_rules:
+            if event_logger is not None:
+                event_logger.warning(
+                    "rag_inyeccion_bloqueada_pregunta",
+                    extra={"extra_data": {"reglas": question_rules}},
+                )
+            return {
+                "trace_id": current_trace,
+                "question": question,
+                "answer": BLOCKED_QUESTION_REPLY,
+                "citations": {},
+                "retrieved_ids": [],
+                "blocked": True,
+                "discarded_sources": [],
+                "retrieval_latency_ms": 0.0,
+                "generation_latency_ms": 0.0,
+                "total_latency_ms": 0.0,
+                "embedding_tokens": 0,
+                "input_tokens": 0,
+                "output_tokens": 0,
+                "estimated_cost_usd": 0.0,
+                "error": None,
+            }
 
-        raw_content = getattr(response, "content", response)
-        answer = normalize_content(raw_content).strip()
-        embedding_tokens = estimate_tokens(question)
-        input_tokens, output_tokens = extract_usage_tokens(response, prompt, answer)
-        cost_usd = calculate_rag_cost_usd(embedding_tokens, input_tokens, output_tokens)
-        total_ms = (time.perf_counter() - total_start) * 1000.0
+        total_start = time.perf_counter()
+        retriever = vectorstore.as_retriever(search_kwargs={"k": k})
 
-        return {
-            "question": question,
-            "answer": answer,
-            "citations": citations,
-            "retrieved_ids": [chunk.id for chunk in chunks if chunk.id is not None],
-            "retrieval_latency_ms": round(retrieval_ms, 2),
-            "generation_latency_ms": round(generation_ms, 2),
-            "total_latency_ms": round(total_ms, 2),
-            "embedding_tokens": embedding_tokens,
-            "input_tokens": input_tokens,
-            "output_tokens": output_tokens,
-            "estimated_cost_usd": round(cost_usd, 8),
-            "error": None,
-        }
-    except Exception as error:
-        total_ms = (time.perf_counter() - total_start) * 1000.0
-        logger.exception("Falló la ejecución del flujo RAG")
-        return {
-            "question": question,
-            "answer": ERROR_REPLY,
-            "citations": {},
-            "retrieved_ids": [],
-            "retrieval_latency_ms": 0.0,
-            "generation_latency_ms": 0.0,
-            "total_latency_ms": round(total_ms, 2),
-            "embedding_tokens": 0,
-            "input_tokens": 0,
-            "output_tokens": 0,
-            "estimated_cost_usd": 0.0,
-            "error": type(error).__name__,
-        }
+        try:
+            retrieval_start = time.perf_counter()
+            chunks = retriever.invoke(question)
+            retrieval_ms = (time.perf_counter() - retrieval_start) * 1000.0
+
+            clean_chunks: list[Document] = []
+            discarded_sources: list[dict[str, Any]] = []
+            for chunk in chunks:
+                rules = detect_injection(chunk.page_content)
+                if rules:
+                    discarded_sources.append(
+                        {
+                            "fuente": (chunk.metadata or {}).get("fuente", "desconocida"),
+                            "reglas": rules,
+                            "huella": text_fingerprint(chunk.page_content),
+                        }
+                    )
+                else:
+                    clean_chunks.append(chunk)
+
+            if discarded_sources and event_logger is not None:
+                event_logger.warning(
+                    "rag_documentos_descartados",
+                    extra={"extra_data": {"descartados": discarded_sources}},
+                )
+
+            if chunks and not clean_chunks:
+                total_ms = (time.perf_counter() - total_start) * 1000.0
+                return {
+                    "trace_id": current_trace,
+                    "question": question,
+                    "answer": ALL_DOCS_DISCARDED_REPLY,
+                    "citations": {},
+                    "retrieved_ids": [],
+                    "blocked": True,
+                    "discarded_sources": discarded_sources,
+                    "retrieval_latency_ms": round(retrieval_ms, 2),
+                    "generation_latency_ms": 0.0,
+                    "total_latency_ms": round(total_ms, 2),
+                    "embedding_tokens": estimate_tokens(question),
+                    "input_tokens": 0,
+                    "output_tokens": 0,
+                    "estimated_cost_usd": round(
+                        calculate_rag_cost_usd(estimate_tokens(question), 0, 0), 8
+                    ),
+                    "error": None,
+                }
+
+            prompt, citations = build_rag_prompt(question, clean_chunks)
+
+            generation_start = time.perf_counter()
+            response = model.invoke(prompt)
+            generation_ms = (time.perf_counter() - generation_start) * 1000.0
+
+            raw_content = getattr(response, "content", response)
+            answer = normalize_content(raw_content).strip()
+            embedding_tokens = estimate_tokens(question)
+            input_tokens, output_tokens = extract_usage_tokens(response, prompt, answer)
+            cost_usd = calculate_rag_cost_usd(embedding_tokens, input_tokens, output_tokens)
+            total_ms = (time.perf_counter() - total_start) * 1000.0
+
+            if event_logger is not None:
+                event_logger.info(
+                    "rag_consulta_finalizada",
+                    extra={
+                        "extra_data": {
+                            "citas": len(citations),
+                            "descartados": len(discarded_sources),
+                            "input_tokens": input_tokens,
+                            "output_tokens": output_tokens,
+                            "total_latency_ms": round(total_ms, 2),
+                            "estimated_cost_usd": round(cost_usd, 8),
+                        }
+                    },
+                )
+
+            return {
+                "trace_id": current_trace,
+                "question": question,
+                "answer": answer,
+                "citations": citations,
+                "retrieved_ids": [chunk.id for chunk in clean_chunks if chunk.id is not None],
+                "blocked": False,
+                "discarded_sources": discarded_sources,
+                "retrieval_latency_ms": round(retrieval_ms, 2),
+                "generation_latency_ms": round(generation_ms, 2),
+                "total_latency_ms": round(total_ms, 2),
+                "embedding_tokens": embedding_tokens,
+                "input_tokens": input_tokens,
+                "output_tokens": output_tokens,
+                "estimated_cost_usd": round(cost_usd, 8),
+                "error": None,
+            }
+        except Exception as error:
+            total_ms = (time.perf_counter() - total_start) * 1000.0
+            logger.exception("Falló la ejecución del flujo RAG")
+            return {
+                "trace_id": current_trace,
+                "question": question,
+                "answer": ERROR_REPLY,
+                "citations": {},
+                "retrieved_ids": [],
+                "blocked": False,
+                "discarded_sources": [],
+                "retrieval_latency_ms": 0.0,
+                "generation_latency_ms": 0.0,
+                "total_latency_ms": round(total_ms, 2),
+                "embedding_tokens": 0,
+                "input_tokens": 0,
+                "output_tokens": 0,
+                "estimated_cost_usd": 0.0,
+                "error": type(error).__name__,
+            }
+    finally:
+        trace_id_var.reset(token)
 
 
 def to_jsonl_record(run: dict[str, Any], k: int) -> dict[str, Any]:

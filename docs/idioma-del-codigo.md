@@ -43,6 +43,12 @@ Decisión del 2026-10-28. El fuente del proyecto va en inglés para que los nomb
 | `decision.py` | `src/personalization_decision.py` |
 | — | `tests/test_personalization.py` |
 | `decision_personalizacion.md` | `docs/decision-personalizacion.md` |
+| `instrumentar.py` | `src/observability_security.py` |
+| `registro_prompts.py` | `src/prompt_registry.py` |
+| `grafo_supervision.py` | `src/supervision_graph.py` |
+| `matriz_riesgos.py` | `src/risk_matrix.py` |
+| — | `tests/test_observability_security.py` |
+| `matriz_riesgos.md` | `docs/matriz-riesgos.md` |
 
 `prompts/registro_resultados.json` conserva el nombre: es la evidencia de la corrida del banco, no código.
 
