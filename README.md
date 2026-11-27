@@ -6,15 +6,16 @@ Asistente IA de **solo lectura** para el gestor académico de una intranet escol
 
 ## Qué hay hecho
 
-| Unidad | Qué | Dónde |
-| --- | --- | --- |
-| U1.2–U1.3 | Primera petición autenticada, módulo de consumo y excepciones | `src/gemini_api.py` |
-| U1.4 | Arquitectura y comparación de modelos | `docs/decision-arquitectura.md`, `src/compare_models.py` |
-| U1.5 | Banco de prompts y prueba de consistencia | `prompts/` |
-| U2.1 | Cliente modular con reintentos, costo y pruebas | `src/client.py`, `tests/test_client.py` |
-| U2.2 | Pipeline de texto, métricas y límites | `src/text_pipeline.py`, `src/text_metrics.py`, `docs/metric-limits.md` |
-| U2.3 | Chain orquestada con LangChain: clasificar, bifurcar, revisar y manejar fallos | `src/routing.py`, `docs/orchestration.md` |
-| U2.4 | Agente con tres herramientas, memoria por sesión, aprobación humana y trazas | `src/agent.py`, `src/supervision.py`, `docs/agents.md`, `docs/agent-autonomy-limits.md` |
+| Unidad | Fecha | Qué | Dónde |
+| --- | --- | --- | --- |
+| U1.2–U1.3 | 2026-10-16 | Primera petición autenticada, módulo de consumo y excepciones | `src/gemini_api.py` |
+| U1.4 | 2026-10-21 | Arquitectura y comparación de modelos | `docs/decision-arquitectura.md`, `src/compare_models.py` |
+| U1.5 | 2026-10-22 | Banco de prompts y prueba de consistencia | `prompts/` |
+| U2.1 | 2026-10-28 | Cliente modular con reintentos, costo y pruebas | `src/client.py`, `tests/test_client.py` |
+| U2.2 | 2026-10-28 | Pipeline de texto, métricas y límites | `src/text_pipeline.py`, `src/text_metrics.py`, `docs/metric-limits.md` |
+| U2.3 | 2026-11-05 | Chain orquestada con LangChain: clasificar, bifurcar, revisar y manejar fallos | `src/routing.py`, `docs/orchestration.md` |
+| U2.4 | 2026-11-12 | Agente con tres herramientas, memoria por sesión, aprobación humana y trazas | `src/agent.py`, `src/supervision.py`, `docs/agents.md`, `docs/agent-autonomy-limits.md` |
+| U2.5 | 2026-11-25 | Flujo RAG modular con Chroma, citas, evaluación P/R/F1 y registro de latencia y costo | `src/rag_indexer.py`, `src/rag_evaluator.py`, `src/rag_pipeline.py`, `tests/test_rag.py`, `docs/rag-latency-cost.md`, `docs/rag-latency-cost.jsonl`, `docs/rag-metrics.json` |
 
 ## Cómo correrlo
 
@@ -24,9 +25,11 @@ pip install -r requirements.txt
 python -m pytest
 python src/routing.py
 python src/agent.py
+python src/rag_indexer.py
+python src/rag_pipeline.py
 ```
 
-Las pruebas no llaman al proveedor. `src/routing.py` y `src/agent.py` sí: necesitan `API_KEY` en el `.env`. `routing.py` hace nueve llamadas reales; `agent.py` hace unas doce y se detiene a pedir tu aprobación (`s`/`n`) antes de enviar el aviso simulado al apoderado.
+Las pruebas no llaman al proveedor (97 tests en verde). `src/routing.py`, `src/agent.py`, `src/rag_indexer.py` y `src/rag_pipeline.py` sí: necesitan `API_KEY` (o `GEMINI_API_KEY`) en el `.env`. `routing.py` hace nueve llamadas reales; `agent.py` hace unas doce y se detiene a pedir tu aprobación (`s`/`n`) antes de enviar el aviso simulado al apoderado; `rag_indexer.py` indexa los 8 documentos en `vectorstore/` y `rag_pipeline.py` evalúa `k=1..4` y registra latencia y costo en `docs/rag-metrics.json`.
 
 ## Idioma del código
 

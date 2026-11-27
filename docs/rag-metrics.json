@@ -1,0 +1,248 @@
+{
+  "timestamp": "2026-11-27T21:23:21.282919+00:00",
+  "model": "gemini-3.5-flash-lite",
+  "k": 3,
+  "queries_total": 4,
+  "queries_ok": 4,
+  "avg_retrieval_latency_ms": 311.04,
+  "avg_generation_latency_ms": 862.14,
+  "avg_total_latency_ms": 1173.23,
+  "total_cost_usd": 0.00066875,
+  "avg_cost_usd": 0.00016719,
+  "retrieval_evaluation": {
+    "k": 3,
+    "cases_total": 8,
+    "cases_with_answer": 7,
+    "avg_precision": 0.2916,
+    "avg_recall": 1.0,
+    "avg_f1": 0.4515,
+    "cases": [
+      {
+        "question": "¿Cuál es el porcentaje mínimo de asistencia para pasar de curso?",
+        "relevant_ids": [
+          "doc0"
+        ],
+        "retrieved_ids": [
+          "doc0",
+          "doc2",
+          "doc1"
+        ],
+        "precision": 0.3333,
+        "recall": 1.0,
+        "f1": 0.5
+      },
+      {
+        "question": "¿Desde qué nota se aprueba una asignatura en la escala escolar?",
+        "relevant_ids": [
+          "doc1"
+        ],
+        "retrieved_ids": [
+          "doc1",
+          "doc0",
+          "doc2"
+        ],
+        "precision": 0.3333,
+        "recall": 1.0,
+        "f1": 0.5
+      },
+      {
+        "question": "¿Se puede enviar un aviso formal al apoderado sin confirmación humana?",
+        "relevant_ids": [
+          "doc2"
+        ],
+        "retrieved_ids": [
+          "doc2",
+          "doc6",
+          "doc5"
+        ],
+        "precision": 0.3333,
+        "recall": 1.0,
+        "f1": 0.5
+      },
+      {
+        "question": "¿Qué hace el cliente HTTP cuando recibe un error 429 o un 401?",
+        "relevant_ids": [
+          "doc3"
+        ],
+        "retrieved_ids": [
+          "doc3",
+          "doc7",
+          "doc6"
+        ],
+        "precision": 0.3333,
+        "recall": 1.0,
+        "f1": 0.5
+      },
+      {
+        "question": "¿Qué modelo de Gemini se eligió y cuánto cuesta por millón de tokens?",
+        "relevant_ids": [
+          "doc4"
+        ],
+        "retrieved_ids": [
+          "doc4",
+          "doc7",
+          "doc6"
+        ],
+        "precision": 0.3333,
+        "recall": 1.0,
+        "f1": 0.5
+      },
+      {
+        "question": "¿Puede el asistente modificar registros oficiales en la base de datos?",
+        "relevant_ids": [
+          "doc5"
+        ],
+        "retrieved_ids": [
+          "doc5",
+          "doc2",
+          "doc6"
+        ],
+        "precision": 0.3333,
+        "recall": 1.0,
+        "f1": 0.5
+      },
+      {
+        "question": "¿Cuántas vueltas máximas puede dar el agente y dónde guarda sus trazas?",
+        "relevant_ids": [
+          "doc6"
+        ],
+        "retrieved_ids": [
+          "doc6",
+          "doc3",
+          "doc2"
+        ],
+        "precision": 0.3333,
+        "recall": 1.0,
+        "f1": 0.5
+      },
+      {
+        "question": "¿Cómo se llama el director del establecimiento y cuál es su horario?",
+        "relevant_ids": [],
+        "retrieved_ids": [
+          "doc5",
+          "doc0",
+          "doc2"
+        ],
+        "precision": 0.0,
+        "recall": null,
+        "f1": 0.0
+      }
+    ]
+  },
+  "k_comparison": [
+    {
+      "k": 1,
+      "avg_precision": 0.875,
+      "avg_recall": 1.0,
+      "avg_f1": 0.9333
+    },
+    {
+      "k": 2,
+      "avg_precision": 0.4375,
+      "avg_recall": 1.0,
+      "avg_f1": 0.6087
+    },
+    {
+      "k": 3,
+      "avg_precision": 0.2916,
+      "avg_recall": 1.0,
+      "avg_f1": 0.4515
+    },
+    {
+      "k": 4,
+      "avg_precision": 0.2188,
+      "avg_recall": 1.0,
+      "avg_f1": 0.359
+    }
+  ],
+  "runs": [
+    {
+      "question": "¿Cuál es el porcentaje mínimo de asistencia para promoción escolar?",
+      "answer": "El porcentaje mínimo de asistencia para promoción escolar es del 85 % [1].",
+      "citations": {
+        "1": "reglamento_asistencia.md",
+        "2": "protocolo_apoderados.md",
+        "3": "reglamento_notas.md"
+      },
+      "retrieved_ids": [
+        "doc0",
+        "doc2",
+        "doc1"
+      ],
+      "retrieval_latency_ms": 313.48,
+      "generation_latency_ms": 1401.8,
+      "total_latency_ms": 1715.36,
+      "embedding_tokens": 17,
+      "input_tokens": 257,
+      "output_tokens": 17,
+      "estimated_cost_usd": 0.00012215,
+      "error": null
+    },
+    {
+      "question": "¿Qué hace el cliente HTTP ante un error 429 y ante un 401?",
+      "answer": "Ante un error 429, el cliente HTTP del asistente reintenta hasta 3 veces aplicando espera exponencial (2, 4 y 8 segundos, tope 30 s) con un jitter del 10% [1]. \nAnte un error 401, el cliente nunca se reintenta y falla de inmediato con ValueError [1].",
+      "citations": {
+        "1": "cliente_reintentos.md",
+        "2": "limites_autonomia.md",
+        "3": "estrategia_pruebas.md"
+      },
+      "retrieved_ids": [
+        "doc3",
+        "doc6",
+        "doc7"
+      ],
+      "retrieval_latency_ms": 319.0,
+      "generation_latency_ms": 832.11,
+      "total_latency_ms": 1151.15,
+      "embedding_tokens": 15,
+      "input_tokens": 284,
+      "output_tokens": 76,
+      "estimated_cost_usd": 0.00027745,
+      "error": null
+    },
+    {
+      "question": "¿Qué rol de base de datos usa el asistente en producción?",
+      "answer": "En producción, el asistente utiliza un rol de base de datos de solo lectura llamado `intranet_ai_ro` [1].",
+      "citations": {
+        "1": "arquitectura_solo_lectura.md",
+        "2": "cliente_reintentos.md",
+        "3": "decision_modelo_costos.md"
+      },
+      "retrieved_ids": [
+        "doc5",
+        "doc3",
+        "doc4"
+      ],
+      "retrieval_latency_ms": 295.02,
+      "generation_latency_ms": 662.79,
+      "total_latency_ms": 957.85,
+      "embedding_tokens": 15,
+      "input_tokens": 277,
+      "output_tokens": 27,
+      "estimated_cost_usd": 0.00015285,
+      "error": null
+    },
+    {
+      "question": "¿Cómo se llama el director del establecimiento?",
+      "answer": "El contexto no alcanza para responder la pregunta sobre cómo se llama el director del establecimiento.",
+      "citations": {
+        "1": "arquitectura_solo_lectura.md",
+        "2": "protocolo_apoderados.md",
+        "3": "reglamento_asistencia.md"
+      },
+      "retrieved_ids": [
+        "doc5",
+        "doc2",
+        "doc0"
+      ],
+      "retrieval_latency_ms": 316.67,
+      "generation_latency_ms": 551.86,
+      "total_latency_ms": 868.57,
+      "embedding_tokens": 12,
+      "input_tokens": 240,
+      "output_tokens": 17,
+      "estimated_cost_usd": 0.0001163,
+      "error": null
+    }
+  ]
+}

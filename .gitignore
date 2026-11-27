@@ -20,3 +20,6 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Vector store local (regenerable con src/rag_indexer.py)
+vectorstore/

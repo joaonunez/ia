@@ -35,6 +35,10 @@ Decisión del 2026-10-28. El fuente del proyecto va en inglés para que los nomb
 | — | `tests/test_agent.py` |
 | — | `tests/test_supervision.py` |
 | `limites_autonomia_agente.md` | `docs/agent-autonomy-limits.md` |
+| `indexar_corpus.py` | `src/rag_indexer.py` |
+| `evaluacion_rag.py` | `src/rag_evaluator.py` |
+| `recuperacion.py` | `src/rag_pipeline.py` |
+| — | `tests/test_rag.py` |
 
 `prompts/registro_resultados.json` conserva el nombre: es la evidencia de la corrida del banco, no código.
 
