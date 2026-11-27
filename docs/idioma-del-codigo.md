@@ -39,6 +39,10 @@ Decisión del 2026-10-28. El fuente del proyecto va en inglés para que los nomb
 | `evaluacion_rag.py` | `src/rag_evaluator.py` |
 | `recuperacion.py` | `src/rag_pipeline.py` |
 | — | `tests/test_rag.py` |
+| `dataset_tuning.py` | `src/tuning_dataset.py` |
+| `decision.py` | `src/personalization_decision.py` |
+| — | `tests/test_personalization.py` |
+| `decision_personalizacion.md` | `docs/decision-personalizacion.md` |
 
 `prompts/registro_resultados.json` conserva el nombre: es la evidencia de la corrida del banco, no código.
 
