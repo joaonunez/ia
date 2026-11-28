@@ -20,6 +20,8 @@ Asistente IA de **solo lectura** para el gestor académico de una intranet escol
    - `GEMINI_API_KEY` (secreto, opcional): clave de API de Gemini. Si queda vacía, el servicio arranca en modo simulado local y `/health` informa `"modelo": "sin clave"`.
    - `API_KEY` (secreto, opcional): alias de compatibilidad para los scripts del Módulo 2 (`src/routing.py`, `src/agent.py`, `src/rag_pipeline.py`).
    - `ENTORNO` (configuración, opcional): `desarrollo` o `produccion` (por omisión `desarrollo`).
+   - `MODELO` (configuración, opcional): `simulado` (por omisión) o `real`.
+   - `PERMITIR_RESPALDO` (configuración, opcional): `0` (por omisión, falla con `503` si el modelo real no está disponible) o `1` (activa `ModeloRespaldo`, ver `docs/respaldos.md`).
 
 ## Cómo arrancar
 
@@ -75,3 +77,4 @@ El registro de revisión del despliegue con criterios `VC-1` a `VC-6` y hallazgo
 | U3.1 | 2026-11-27 | Ficha de Diseño Funcional (5 secciones), diagrama PNG y verificadores | `docs/ficha_diseno_funcional.md`, `docs/diagrama_arquitectura.png`, `docs/revision_alcance.md`, `verificar_ficha_completa.py` |
 | U3.2 | 2026-11-28 | Servicio FastAPI (`servicio/`), validación, errores unificados, cliente externo `httpx2` y evidencia HTTP | `verificar_servicio.py`, `casos.py`, `cliente_externo.py`, `registrar_pruebas.py`, `docs/registro_pruebas.md` |
 | U3.3 | 2026-11-28 | Dockerfiles endurecidos, composición `compose.yaml` (`api` + `interfaz`), secretos y verificación cruzada | `compose.yaml`, `interfaz/main.py`, `verificar_dockerfile.py`, `verificar_imagen.py`, `buscar_secretos.py`, `verificar_stack.py`, `verificar_entrega.py`, `docs/verificacion_cruzada.md` |
+| U3.4 | 2026-11-28 | Pruebas parciales con guardias de contrato, escenarios E2E, bitácora de ajustes, respaldo explícito `503` y registro verificable | `servicio/cadena.py`, `servicio/contratos.py`, `servicio/respaldo.py`, `escenarios.py`, `ejecutar_escenarios.py`, `registrar_ejecucion.py`, `verificar_ejecucion.py`, `verificar_registro.py`, `docs/bitacora_ajustes.md`, `docs/respaldos.md`, `docs/registro_ejecucion.md` |

@@ -6,12 +6,12 @@ toda la lógica a `servicio.logica`, aplica formato único de error mediante
 """
 from __future__ import annotations
 
-import os
 from typing import Annotated
 
 from fastapi import FastAPI, HTTPException, Path
+from fastapi.responses import JSONResponse
 
-from servicio import errores, logica
+from servicio import config, errores, logica, respaldo
 from servicio.esquemas import (
     Consulta,
     ErrorRespuesta,
@@ -37,18 +37,39 @@ errores.registrar(app)
 @app.get(
     "/health",
     response_model=EstadoSalud,
+    responses={
+        503: {
+            "description": "El modelo solicitado no está disponible y el respaldo no está habilitado.",
+        },
+    },
     tags=["sistema"],
     summary="Comprobar estado del servicio",
 )
-def health() -> EstadoSalud:
-    """Indica que el servicio HTTP está levantado sin requerir clave de API."""
-    tiene_clave = bool(os.getenv("GEMINI_API_KEY") or os.getenv("API_KEY"))
+def health() -> EstadoSalud | JSONResponse:
+    """Indica estado del servicio y qué modelo atiende (`modelo_activo`)."""
+    estado_clave = "configurado" if config.modelo_configurado() else "sin clave"
+    try:
+        activo = respaldo.elegir_modelo().nombre
+    except respaldo.ModeloNoDisponible as error:
+        return JSONResponse(
+            status_code=503,
+            content={
+                "estado": "error",
+                "servicio": "asistente-academico-ia",
+                "version": VERSION_SERVICIO,
+                "entorno": config.entorno(),
+                "modelo": estado_clave,
+                "modelo_activo": "ninguno",
+                "motivo": str(error),
+            },
+        )
     return EstadoSalud(
         estado="ok",
         servicio="asistente-academico-ia",
         version=VERSION_SERVICIO,
-        entorno=os.getenv("ENTORNO", "desarrollo"),
-        modelo="configurado" if tiene_clave else "sin clave",
+        entorno=config.entorno(),
+        modelo=estado_clave,
+        modelo_activo=activo,
     )
 
 

@@ -8,6 +8,9 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from servicio.contratos import ContratoIncumplido
+from servicio.respaldo import ModeloNoDisponible
+
 logger = logging.getLogger("servicio.errores")
 
 CODIGOS: dict[int, str] = {
@@ -73,11 +76,12 @@ async def manejar_error_interno(
     exc: Exception,
 ) -> JSONResponse:
     """Devuelve 500 genérico sin filtrar trazas, rutas ni secretos al cliente."""
+    detalle = str(exc) if isinstance(exc, ContratoIncumplido) else type(exc).__name__
     logger.error(
-        "Error interno en %s %s (%s)",
+        "error interno en %s %s: %s",
         request.method,
         request.url.path,
-        type(exc).__name__,
+        detalle,
     )
     return construir_error(
         500,
@@ -86,8 +90,21 @@ async def manejar_error_interno(
     )
 
 
+async def manejar_modelo_no_disponible(
+    _request: Request,
+    exc: ModeloNoDisponible,
+) -> JSONResponse:
+    """Devuelve 503 explícito cuando el modelo real no está disponible sin respaldo."""
+    return construir_error(
+        503,
+        "modelo_no_disponible",
+        f"El modelo no está disponible: {exc}.",
+    )
+
+
 def registrar(app: FastAPI) -> None:
     """Registra los manejadores globales de error en la aplicación FastAPI."""
+    app.add_exception_handler(ModeloNoDisponible, manejar_modelo_no_disponible)
     app.add_exception_handler(RequestValidationError, manejar_entrada_invalida)
     app.add_exception_handler(StarletteHTTPException, manejar_error_http)
     app.add_exception_handler(Exception, manejar_error_interno)

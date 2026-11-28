@@ -26,6 +26,7 @@ from observability_security import (  # noqa: E402
     trace_id_var,
 )
 from rag_corpus import CORPUS  # noqa: E402
+from servicio import cadena, respaldo  # noqa: E402
 
 logger = logging.getLogger("servicio.logica")
 
@@ -157,25 +158,8 @@ def _obtener_rag_en_vivo():
 
 
 def _buscar_en_corpus_local(pregunta: str) -> tuple[str, list[str]]:
-    """Recupera el documento más pertinente del corpus de U2.5 y construye respuesta citada."""
-    q_terms = _palabras_clave(pregunta)
-    if not q_terms:
-        return SIN_INFORMACION_REPLY, []
-
-    mejor_doc: dict[str, Any] | None = None
-    mejor_puntaje = 0
-    for doc in CORPUS:
-        doc_terms = _palabras_clave(doc["contenido"] + " " + doc["tema"])
-        coincidencias = len(q_terms & doc_terms)
-        if coincidencias > mejor_puntaje:
-            mejor_puntaje = coincidencias
-            mejor_doc = doc
-
-    if mejor_doc is None or mejor_puntaje < 2:
-        return SIN_INFORMACION_REPLY, []
-
-    texto = f"{mejor_doc['contenido']} [1]"
-    return texto, [mejor_doc["fuente"]]
+    """Delega la recuperación y generación local en la cadena usando el modelo activo."""
+    return cadena.ejecutar(pregunta, respaldo.elegir_modelo())
 
 
 def responder_consulta(pregunta: str) -> dict[str, Any]:

@@ -13,8 +13,13 @@ import sys
 
 RAIZ = Path(__file__).resolve().parent
 
+CLAVE_GOOGLE = re.compile(r"AIza[0-9A-Za-z_-]{20,}")
+ASIGNACION = re.compile(
+    r"(?i)\b(?:GEMINI_API_KEY|API_KEY)\s*=\s*['\"]?(?!\s*$)(?!tu_llave_aqui)(?!clave-de-prueba)(?!\$\{)[A-Za-z0-9_\-]{12,}"
+)
+
 PATRONES_SECRETO: tuple[tuple[str, re.Pattern[str]], ...] = (
-    ("google_api_key", re.compile(r"AIza[0-9A-Za-z_-]{20,}")),
+    ("google_api_key", CLAVE_GOOGLE),
     ("openai_key", re.compile(r"sk-[0-9A-Za-z]{20,}")),
     ("private_key_header", re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY-----")),
 )

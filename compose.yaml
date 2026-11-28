@@ -3,11 +3,13 @@ name: asistente-academico
 services:
   api:
     build: .
-    image: asistente-academico/api:0.3
+    image: asistente-academico/api:0.4
     environment:
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       API_KEY: ${API_KEY:-}
       ENTORNO: ${ENTORNO:-desarrollo}
+      MODELO: ${MODELO:-simulado}
+      PERMITIR_RESPALDO: ${PERMITIR_RESPALDO:-0}
     ports:
       - "8000:8000"
 

@@ -29,6 +29,11 @@ class EstadoSalud(BaseModel):
         description="Estado de la credencial del proveedor ('configurado' o 'sin clave', sin exponer secretos).",
         examples=["sin clave"],
     )
+    modelo_activo: str = Field(
+        default="simulado",
+        description="Implementación de modelo activa ('simulado', 'respaldo', 'real' o 'ninguno').",
+        examples=["simulado"],
+    )
 
 
 class Consulta(BaseModel):
