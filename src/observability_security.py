@@ -154,23 +154,34 @@ def detect_injection(text: str) -> list[str]:
     return matched
 
 
+def _extract_doc_fields(doc: Any) -> tuple[str, str]:
+    """Soporta tanto `SourceDocument` (content/source) como LangChain `Document` (page_content/metadata)."""
+    if hasattr(doc, "page_content"):
+        text = str(doc.page_content)
+        metadata = getattr(doc, "metadata", None) or {}
+        source = str(metadata.get("fuente", "desconocida"))
+        return text, source
+    return str(doc.content), str(doc.source)
+
+
 def filter_suspicious_documents(
-    documents: list[SourceDocument],
+    documents: list[Any],
     log: logging.Logger | None = None,
-) -> tuple[list[SourceDocument], list[dict[str, Any]]]:
+) -> tuple[list[Any], list[dict[str, Any]]]:
     """Separa documentos limpios de los descartados por inyección indirecta."""
-    clean: list[SourceDocument] = []
+    clean: list[Any] = []
     discarded: list[dict[str, Any]] = []
 
     for doc in documents:
-        rules = detect_injection(doc.content)
+        text, source = _extract_doc_fields(doc)
+        rules = detect_injection(text)
         if rules:
             discarded.append(
                 {
-                    "fuente": doc.source,
+                    "fuente": source,
                     "reglas": rules,
-                    "huella": text_fingerprint(doc.content),
-                    "longitud": len(doc.content),
+                    "huella": text_fingerprint(text),
+                    "longitud": len(text),
                 }
             )
         else:

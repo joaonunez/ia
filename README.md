@@ -18,6 +18,7 @@ Asistente IA de **solo lectura** para el gestor académico de una intranet escol
 | U2.5 | 2026-11-25 | Flujo RAG modular con Chroma, citas, evaluación P/R/F1 y registro de latencia y costo | `src/rag_indexer.py`, `src/rag_evaluator.py`, `src/rag_pipeline.py`, `tests/test_rag.py`, `docs/rag-latency-cost.md`, `docs/rag-latency-cost.jsonl`, `docs/rag-metrics.json` |
 | U2.6 | 2026-11-27 | Dataset PEFT validado, estimación de costos de etiquetado y decisión fundamentada de personalización | `src/tuning_dataset.py`, `src/personalization_decision.py`, `tests/test_personalization.py`, `docs/decision-personalizacion.md` |
 | U2.7 | 2026-11-27 | Logging JSON con `trace_id`, filtro anti-inyección en 3 capas, versionado de prompts, supervisión LangGraph y matriz de riesgos | `src/observability_security.py`, `src/prompt_registry.py`, `src/supervision_graph.py`, `src/risk_matrix.py`, `tests/test_observability_security.py`, `docs/matriz-riesgos.md` |
+| U2.8 | 2026-11-27 | Autochequeo automático del Gate 2 (4 criterios no compensables + ensayo funcional integrado) y registro del ensayo | `tests/test_gate2.py`, `docs/ensayo-gate2.md` |
 
 ## Cómo correrlo
 
@@ -37,7 +38,7 @@ python src/supervision_graph.py
 python src/risk_matrix.py
 ```
 
-Las pruebas no llaman al proveedor (132 tests en verde). `src/routing.py`, `src/agent.py`, `src/rag_indexer.py` y `src/rag_pipeline.py` sí: necesitan `API_KEY` (o `GEMINI_API_KEY`) en el `.env`. `routing.py` hace nueve llamadas reales; `agent.py` hace unas doce y se detiene a pedir tu aprobación (`s`/`n`) antes de enviar el aviso simulado al apoderado; `rag_indexer.py` indexa los 8 documentos en `vectorstore/` y `rag_pipeline.py` evalúa `k=1..4` y registra latencia y costo en `docs/rag-metrics.json`.
+Las pruebas no llaman al proveedor (138 tests en verde). `src/routing.py`, `src/agent.py`, `src/rag_indexer.py` y `src/rag_pipeline.py` sí: necesitan `API_KEY` (o `GEMINI_API_KEY`) en el `.env`. `routing.py` hace nueve llamadas reales; `agent.py` hace unas doce y se detiene a pedir tu aprobación (`s`/`n`) antes de enviar el aviso simulado al apoderado; `rag_indexer.py` indexa los 8 documentos en `vectorstore/` y `rag_pipeline.py` evalúa `k=1..4` y registra latencia y costo en `docs/rag-metrics.json`.
 
 ## Idioma del código
 
