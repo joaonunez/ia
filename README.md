@@ -1,71 +1,77 @@
-# Proyecto gradual de Joao Nunez — Especialización en Desarrollo con IA Generativa (Accenture)
+# Asistente Académico IA — Proyecto Gradual de Joao Nunez (Accenture / Skillnest)
 
 Repositorio: https://github.com/joaonunez/ia
 
-Asistente IA de **solo lectura** para el gestor académico de una intranet escolar: responde consultas en lenguaje natural sobre notas y asistencia usando la API de Gemini (`gemini-3.5-flash-lite`, elegido en [`docs/decision-arquitectura.md`](docs/decision-arquitectura.md)).
+Asistente IA de **solo lectura** para el gestor académico de una intranet escolar: responde consultas reglamentarias con citas verificables, filtro anti-inyección y datos simulados de estudiantes, compuesto en Docker Compose con una API FastAPI y una interfaz web mínima.
 
-## Qué hay hecho
+## Requisitos
+
+- Docker con Compose (`docker compose version`).
+- Puertos `8000` (API) y `8080` (interfaz web) libres en tu equipo.
+- Opcional, para ejecutar verificadores locales y suite de pruebas: Python 3.11+ y dependencias de `requirements-dev.txt`.
+
+## Configuración
+
+1. Copia la plantilla de variables de entorno:
+   ```bash
+   cp .env.example .env
+   ```
+2. Completa `.env` según necesites (el archivo `.env` está excluido en `.gitignore` y nunca se sube a git):
+   - `GEMINI_API_KEY` (secreto, opcional): clave de API de Gemini. Si queda vacía, el servicio arranca en modo simulado local y `/health` informa `"modelo": "sin clave"`.
+   - `API_KEY` (secreto, opcional): alias de compatibilidad para los scripts del Módulo 2 (`src/routing.py`, `src/agent.py`, `src/rag_pipeline.py`).
+   - `ENTORNO` (configuración, opcional): `desarrollo` o `produccion` (por omisión `desarrollo`).
+
+## Cómo arrancar
+
+```bash
+docker compose up -d --build
+```
+
+Cuando termine, la solución queda disponible en:
+- API FastAPI y documentación OpenAPI: http://127.0.0.1:8000/docs (salud en http://127.0.0.1:8000/health)
+- Interfaz web: http://127.0.0.1:8080 (salud en http://127.0.0.1:8080/health)
+
+## Cómo comprobar que funciona
+
+1. Confirma que ambos servicios están sanos:
+   ```bash
+   docker compose ps
+   ```
+   Debes ver `api` e `interfaz` en estado `healthy`.
+2. Abre http://127.0.0.1:8080, escribe `¿Cuál es el porcentaje mínimo de asistencia para promoción escolar?` y pulsa **Preguntar**: debe responder con `85 %` y la fuente `"reglamento_asistencia.md"` (del corpus en `src/rag_corpus.py`).
+3. Ejecuta los verificadores automáticos desde la raíz del repositorio:
+   - `python verificar_dockerfile.py` y `python verificar_dockerfile.py interfaz/Dockerfile` → `7 de 7 reglas cumplidas`.
+   - `python buscar_secretos.py` → `5 de 5 comprobaciones cumplidas`.
+   - `python verificar_stack.py` → `7 de 7 comprobaciones cumplidas` (levanta, prueba los 16 casos y apaga).
+   - `python verificar_entrega.py` → `7 de 7 comprobaciones cumplidas`.
+   - `python -m pytest` → suite completa sin llamadas de red al proveedor.
+
+## Cómo detener
+
+```bash
+docker compose down
+```
+
+Detiene y elimina los contenedores y la red del proyecto sin borrar las imágenes construidas.
+
+## Problemas frecuentes
+
+- **`Bind for 0.0.0.0:8000 failed: port is already allocated`**: otro proceso o contenedor usa el puerto `8000` (u `8080`). Detenlo o cambia el puerto izquierdo en `compose.yaml`.
+- **`/health` muestra `"modelo": "sin clave"`**: comportamiento esperado si no definiste `GEMINI_API_KEY` en `.env`. Si la agregaste, recrea el contenedor con `docker compose up -d`.
+- **La interfaz devuelve `502`**: no logra contactar a `api` en `http://api:8000`. Revisa `docker compose logs api`.
+- **Error al conectar al motor de Docker en Windows**: abre **Docker Desktop** y espera a que `docker ps` responda sin error.
+
+## Verificación cruzada
+
+El registro de revisión del despliegue con criterios `VC-1` a `VC-6` y hallazgos está en `docs/verificacion_cruzada.md`.
+
+## Avance por unidad
 
 | Unidad | Fecha | Qué | Dónde |
 | --- | --- | --- | --- |
-| U1.2–U1.3 | 2026-10-16 | Primera petición autenticada, módulo de consumo y excepciones | `src/gemini_api.py` |
-| U1.4 | 2026-10-21 | Arquitectura y comparación de modelos | `docs/decision-arquitectura.md`, `src/compare_models.py` |
-| U1.5 | 2026-10-22 | Banco de prompts y prueba de consistencia | `prompts/` |
-| U2.1 | 2026-10-28 | Cliente modular con reintentos, costo y pruebas | `src/client.py`, `tests/test_client.py` |
-| U2.2 | 2026-10-28 | Pipeline de texto, métricas y límites | `src/text_pipeline.py`, `src/text_metrics.py`, `docs/metric-limits.md` |
-| U2.3 | 2026-11-05 | Chain orquestada con LangChain: clasificar, bifurcar, revisar y manejar fallos | `src/routing.py`, `docs/orchestration.md` |
-| U2.4 | 2026-11-12 | Agente con tres herramientas, memoria por sesión, aprobación humana y trazas | `src/agent.py`, `src/supervision.py`, `docs/agents.md`, `docs/agent-autonomy-limits.md` |
-| U2.5 | 2026-11-25 | Flujo RAG modular con Chroma, citas, evaluación P/R/F1 y registro de latencia y costo | `src/rag_indexer.py`, `src/rag_evaluator.py`, `src/rag_pipeline.py`, `tests/test_rag.py`, `docs/rag-latency-cost.md`, `docs/rag-latency-cost.jsonl`, `docs/rag-metrics.json` |
-| U2.6 | 2026-11-27 | Dataset PEFT validado, estimación de costos de etiquetado y decisión fundamentada de personalización | `src/tuning_dataset.py`, `src/personalization_decision.py`, `tests/test_personalization.py`, `docs/decision-personalizacion.md` |
-| U2.7 | 2026-11-27 | Logging JSON con `trace_id`, filtro anti-inyección en 3 capas, versionado de prompts, supervisión LangGraph y matriz de riesgos | `src/observability_security.py`, `src/prompt_registry.py`, `src/supervision_graph.py`, `src/risk_matrix.py`, `tests/test_observability_security.py`, `docs/matriz-riesgos.md` |
-| U2.8 | 2026-11-27 | Autochequeo automático del Gate 2 (4 criterios no compensables + ensayo funcional integrado) y registro del ensayo | `tests/test_gate2.py`, `docs/ensayo-gate2.md` |
-| U3.1 | 2026-11-27 | Ficha de Diseño Funcional completa (5 secciones), diagrama PNG, revisión cruzada y scripts verificadores | `docs/ficha_diseno_funcional.md`, `docs/diagrama_arquitectura.png`, `docs/revision_alcance.md`, `verificar_ficha.py`, `ficha_datos.py`, `resumen_ficha.py`, `verificar_ficha_completa.py`, `tests/test_design_spec.py` |
-| U3.2 | 2026-11-28 | Servicio FastAPI (`esquemas`, `logica`, `errores`, `main`), OpenAPI, validación estricta, cliente externo `httpx2` y evidencia HTTP | `servicio/`, `src/rag_corpus.py`, `verificar_servicio.py`, `casos.py`, `cliente_externo.py`, `registrar_pruebas.py`, `tests/test_api.py`, `tests/test_api_service.py`, `docs/registro_pruebas.md` |
-
-## Cómo correrlo
-
-```bash
-python -m venv venv
-pip install -r requirements.txt
-python -m pytest
-python src/routing.py
-python src/agent.py
-python src/rag_indexer.py
-python src/rag_pipeline.py
-python src/tuning_dataset.py
-python src/personalization_decision.py
-python src/observability_security.py
-python src/prompt_registry.py
-python src/supervision_graph.py
-python src/risk_matrix.py
-```
-
-Las pruebas no llaman al proveedor (165 tests en verde). `src/routing.py`, `src/agent.py`, `src/rag_indexer.py` y `src/rag_pipeline.py` sí: necesitan `API_KEY` (o `GEMINI_API_KEY`) en el `.env`. `routing.py` hace nueve llamadas reales; `agent.py` hace unas doce y se detiene a pedir tu aprobación (`s`/`n`) antes de enviar el aviso simulado al apoderado; `rag_indexer.py` indexa los 8 documentos en `vectorstore/` y `rag_pipeline.py` evalúa `k=1..4` y registra latencia y costo en `docs/rag-metrics.json`. Para levantar el servicio HTTP de U3.2: `uvicorn servicio.main:app --port 8000` y probar con `python cliente_externo.py` o `python registrar_pruebas.py`.
-
-## Idioma del código
-
-Archivos, funciones y variables van en inglés. Comentarios, mensajes y la instrucción del modelo van en español. El detalle está en [`docs/idioma-del-codigo.md`](docs/idioma-del-codigo.md).
-
-## Cómo empezar
-
-Estos pasos se completan de forma progresiva a lo largo de la Unidad U1.2, no todos el mismo día:
-
-1. Descarga este archivo comprimido (adjunto en la plataforma) y descomprímelo en tu computador. Inicializa el control de versiones sobre esa carpeta y registra tu primer commit con esta estructura base, tal como llegó, antes de modificar nada.
-2. Crea tu entorno virtual de Python (por ejemplo, con `venv`) y actívalo.
-3. Instala las dependencias que necesites y regístralas en `requirements.txt` (al inicio puede estar vacío o con muy pocas).
-4. Copia `.env.example` a un archivo nuevo llamado `.env`, y completa ahí tus credenciales reales (llaves de API, tokens). El archivo `.env` nunca se sube al repositorio: ya está excluido en `.gitignore`.
-
-## Estructura de carpetas
-
-- `src/` : todo el código fuente de tu proyecto va aquí.
-- `docs/` : documentación técnica del proyecto (diagramas, decisiones de arquitectura, notas).
-- `tests/` : pruebas de tu código (las vas a usar más adelante en el programa, cuando el proyecto lo requiera).
-- `requirements.txt` : dependencias de Python de tu proyecto, para que cualquier otra persona pueda reconstruir tu entorno con un solo comando.
-- `.env.example` : plantilla de las variables de entorno que tu proyecto necesita, sin valores reales. Tu archivo `.env` real (con tus credenciales) nunca se commitea.
-- `.gitignore` : le dice a Git qué archivos y carpetas ignorar (entre ellos, tu entorno virtual y tu archivo `.env`).
-
-## Reglas que se mantienen durante todo el programa
-
-- Ningún secreto (contraseña, llave de API, token) va escrito directamente en el código ni en ningún archivo que se suba al repositorio.
-- Cada proyecto nuevo tiene su propio entorno virtual: no se comparten dependencias entre proyectos distintos.
-- Todo el trabajo que se entrega en este programa vive en un repositorio de GitHub, sin excepción.
+| U1.2–U1.5 | 2026-10-16..22 | Cliente inicial, comparación de modelos y banco de prompts | `src/gemini_api.py`, `docs/decision-arquitectura.md`, `src/compare_models.py` |
+| U2.1–U2.4 | 2026-10-28..11-12 | Cliente con reintentos, pipeline NLP, chains LangChain y agente con memoria y supervisión | `src/client.py`, `src/text_pipeline.py`, `src/routing.py`, `src/agent.py`, `src/supervision.py` |
+| U2.5–U2.8 | 2026-11-25..27 | RAG Chroma con citas, personalización PEFT, observabilidad/seguridad, matriz de riesgos y Gate 2 | `src/rag_indexer.py`, `src/rag_pipeline.py`, `src/observability_security.py`, `docs/matriz-riesgos.md`, `docs/ensayo-gate2.md` |
+| U3.1 | 2026-11-27 | Ficha de Diseño Funcional (5 secciones), diagrama PNG y verificadores | `docs/ficha_diseno_funcional.md`, `docs/diagrama_arquitectura.png`, `docs/revision_alcance.md`, `verificar_ficha_completa.py` |
+| U3.2 | 2026-11-28 | Servicio FastAPI (`servicio/`), validación, errores unificados, cliente externo `httpx2` y evidencia HTTP | `verificar_servicio.py`, `casos.py`, `cliente_externo.py`, `registrar_pruebas.py`, `docs/registro_pruebas.md` |
+| U3.3 | 2026-11-28 | Dockerfiles endurecidos, composición `compose.yaml` (`api` + `interfaz`), secretos y verificación cruzada | `compose.yaml`, `interfaz/main.py`, `verificar_dockerfile.py`, `verificar_imagen.py`, `buscar_secretos.py`, `verificar_stack.py`, `verificar_entrega.py`, `docs/verificacion_cruzada.md` |

@@ -1,0 +1,23 @@
+name: asistente-academico
+
+services:
+  api:
+    build: .
+    image: asistente-academico/api:0.3
+    environment:
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      API_KEY: ${API_KEY:-}
+      ENTORNO: ${ENTORNO:-desarrollo}
+    ports:
+      - "8000:8000"
+
+  interfaz:
+    build: ./interfaz
+    image: asistente-academico/interfaz:0.1
+    environment:
+      API_URL: http://api:8000
+    ports:
+      - "8080:8000"
+    depends_on:
+      api:
+        condition: service_healthy

@@ -19,6 +19,16 @@ class EstadoSalud(BaseModel):
         description="Versión semántica del servicio HTTP.",
         examples=["0.2.0"],
     )
+    entorno: str = Field(
+        default="desarrollo",
+        description="Entorno de ejecución configurado mediante variable de entorno ENTORNO.",
+        examples=["desarrollo"],
+    )
+    modelo: str = Field(
+        default="sin clave",
+        description="Estado de la credencial del proveedor ('configurado' o 'sin clave', sin exponer secretos).",
+        examples=["sin clave"],
+    )
 
 
 class Consulta(BaseModel):

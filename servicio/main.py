@@ -6,6 +6,7 @@ toda la lógica a `servicio.logica`, aplica formato único de error mediante
 """
 from __future__ import annotations
 
+import os
 from typing import Annotated
 
 from fastapi import FastAPI, HTTPException, Path
@@ -41,10 +42,13 @@ errores.registrar(app)
 )
 def health() -> EstadoSalud:
     """Indica que el servicio HTTP está levantado sin requerir clave de API."""
+    tiene_clave = bool(os.getenv("GEMINI_API_KEY") or os.getenv("API_KEY"))
     return EstadoSalud(
         estado="ok",
         servicio="asistente-academico-ia",
         version=VERSION_SERVICIO,
+        entorno=os.getenv("ENTORNO", "desarrollo"),
+        modelo="configurado" if tiene_clave else "sin clave",
     )
 
 
