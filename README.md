@@ -2,13 +2,26 @@
 
 Repositorio: https://github.com/joaonunez/ia
 
-Asistente IA de **solo lectura** para el gestor académico de una intranet escolar: responde consultas reglamentarias con citas verificables, filtro anti-inyección y datos simulados de estudiantes, compuesto en Docker Compose con una API FastAPI y una interfaz web mínima.
+Asistente IA de **solo lectura** para el gestor académico de una intranet escolar: responde consultas reglamentarias con citas verificables, defensa en profundidad contra inyección/alucinaciones y datos simulados de estudiantes, compuesto en Docker Compose con una API FastAPI y una interfaz web mínima.
 
 ## Requisitos
 
 - Docker con Compose (`docker compose version`).
 - Puertos `8000` (API) y `8080` (interfaz web) libres en tu equipo.
-- Opcional, para ejecutar verificadores locales y suite de pruebas: Python 3.11+ y dependencias de `requirements-dev.txt`.
+- Python `3.11` (misma versión que `Dockerfile`: `python:3.11-slim`) para ejecutar pruebas y verificadores locales.
+
+## Instalación
+
+Ejecuta todos los comandos desde la raíz del repositorio:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate      # Linux / macOS
+# En Windows PowerShell:
+# Set-ExecutionPolicy -Scope Process RemoteSigned
+# .venv\Scripts\Activate.ps1
+pip install -r requirements-dev.txt
+```
 
 ## Configuración
 
@@ -16,7 +29,7 @@ Asistente IA de **solo lectura** para el gestor académico de una intranet escol
    ```bash
    cp .env.example .env
    ```
-2. Completa `.env` según necesites (el archivo `.env` está excluido en `.gitignore` y nunca se sube a git):
+2. Completa `.env` según necesites (`.env` está excluido en `.gitignore` y nunca se sube a git):
    - `GEMINI_API_KEY` (secreto, opcional): clave de API de Gemini. Si queda vacía, el servicio arranca en modo simulado local y `/health` informa `"modelo": "sin clave"`.
    - `API_KEY` (secreto, opcional): alias de compatibilidad para los scripts del Módulo 2 (`src/routing.py`, `src/agent.py`, `src/rag_pipeline.py`).
    - `ENTORNO` (configuración, opcional): `desarrollo` o `produccion` (por omisión `desarrollo`).
@@ -25,12 +38,20 @@ Asistente IA de **solo lectura** para el gestor académico de una intranet escol
 
 ## Cómo arrancar
 
+### Con Docker Compose (recomendado)
+
 ```bash
 docker compose up -d --build
 ```
 
+### Sin Docker (desarrollo local)
+
+```bash
+python -m uvicorn servicio.main:app --host 127.0.0.1 --port 8000
+```
+
 Cuando termine, la solución queda disponible en:
-- API FastAPI y documentación OpenAPI: http://127.0.0.1:8000/docs (salud en http://127.0.0.1:8000/health)
+- API FastAPI y OpenAPI: http://127.0.0.1:8000/docs (salud en http://127.0.0.1:8000/health; referencia generada en `docs/api.md`)
 - Interfaz web: http://127.0.0.1:8080 (salud en http://127.0.0.1:8080/health)
 
 ## Cómo comprobar que funciona
@@ -46,7 +67,35 @@ Cuando termine, la solución queda disponible en:
    - `python buscar_secretos.py` → `5 de 5 comprobaciones cumplidas`.
    - `python verificar_stack.py` → `7 de 7 comprobaciones cumplidas` (levanta, prueba los 16 casos y apaga).
    - `python verificar_entrega.py` → `7 de 7 comprobaciones cumplidas`.
-   - `python -m pytest` → suite completa sin llamadas de red al proveedor.
+
+## Pruebas
+
+Suite automatizada sin red ni credenciales externas:
+
+- Suite completa: `python -m pytest -q`
+- Matriz QA y seguridad: `python verificar_matriz.py`, `python verificar_mitigaciones.py`, `python verificar_riesgos.py`
+- Documentación y transferencia: `python verificar_readme.py`, `python generar_api_md.py --comprobar`, `python verificar_transferencia.py`, `python verificar_decisiones.py`, `python probar_en_frio.py`
+
+## Decisiones
+
+Las decisiones de arquitectura vigentes (`D-01`, `D-02`, `D-03`, `D-04`, `D-05`, `D-06`) se documentan con contexto, alternativas descartadas y costo en `docs/decisiones.md`:
+
+- `D-01` (RAG de solo lectura sobre datos simulados), `D-02` (falla honesta HTTP 503 sin modelo real), `D-03` (cadena de 4 componentes con contratos Pydantic), `D-04` (defensa en profundidad), `D-05` (FastAPI + Docker Compose en dos servicios) y `D-06` (modelo objetivo `gemini-3.5-flash-lite`).
+
+## Limitaciones
+
+Todas las limitaciones técnicas verificadas (`LIM-01`, `LIM-02`, `LIM-03`, `LIM-04`) están trazadas contra su origen en código y su riesgo en `docs/limitaciones.md` y `docs/matriz_riesgos.md`:
+
+- `LIM-01` (`MP-08` / `R-06`): recuperación léxica en modo simulado no resuelve sinónimos puros; en producción con `USE_LIVE_RAG=true` se mitiga con Chroma.
+- `LIM-02` (`A-07` / `R-01`): evasión léxica con guiones intercalados supera el filtro inicial; contenida por limpieza de salida y solo lectura.
+- `LIM-03` (`H-04` / `R-03`) y `LIM-04` (`H-05` / `R-03`): afirmaciones cualitativas agregadas y cifras en letras requieren supervisión humana del gestor académico.
+
+## Estructura
+
+- `servicio/`: API FastAPI (`servicio/main.py`, `servicio/cadena.py`, `servicio/logica.py`, `servicio/seguridad.py`, `servicio/fundamentacion.py`, `servicio/contratos.py`, `servicio/respaldo.py`, `servicio/errores.py`).
+- `interfaz/`: cliente web ligero (`interfaz/main.py`, `interfaz/Dockerfile`).
+- `docs/`: ficha funcional (`docs/ficha_diseno_funcional.md`), referencia API (`docs/api.md`), decisiones (`docs/decisiones.md`), limitaciones (`docs/limitaciones.md`), matrices (`docs/matriz_pruebas.md`, `docs/matriz_riesgos.md`), transferencia (`docs/prueba_transferencia.md`) y diario (`docs/diario_de_friccion.md`).
+- `tests/`: pruebas unitarias y parciales en `tests/parciales/`.
 
 ## Cómo detener
 
@@ -67,14 +116,6 @@ Detiene y elimina los contenedores y la red del proyecto sin borrar las imágene
 
 El registro de revisión del despliegue con criterios `VC-1` a `VC-6` y hallazgos está en `docs/verificacion_cruzada.md`.
 
-## Limitaciones conocidas
-
-Todas las limitaciones técnicas verificadas en código están cubiertas y trazadas en `docs/matriz_riesgos.md` (`riesgos.py` / `verificar_riesgos.py`):
-
-- **`MP-08` (paráfrasis sin palabras clave literales en modo simulado):** la recuperación léxica local sin embeddings devuelve `SIN_INFORMACION` ante sinónimos puros (`docs/matriz_modelo.md`). En producción con `USE_LIVE_RAG=true` se mitiga con embeddings en Chroma.
-- **`A-07` (evasión léxica con guiones intercalados):** el filtro de entrada basado en expresiones regulares no reconstruye palabras partidas con guiones (`ataques.py`); se mitiga en profundidad con `limpiar_salida()`, compuerta de fundamentación y modo solo lectura.
-- **`H-04` y `H-05` (afirmaciones cualitativas agregadas y cifras en letras):** la compuerta mecánica `servicio/fundamentacion.py` valida respaldo, fuentes y cifras en dígitos (`docs/registro_alucinaciones.md`), por lo que el riesgo residual `R-03` (`ALTO`) exige validación humana contra la fuente citada antes de emitir avisos formales a apoderados.
-
 ## Avance por unidad
 
 | Unidad | Fecha | Qué | Dónde |
@@ -87,3 +128,4 @@ Todas las limitaciones técnicas verificadas en código están cubiertas y traza
 | U3.3 | 2026-11-28 | Dockerfiles endurecidos, composición `compose.yaml` (`api` + `interfaz`), secretos y verificación cruzada | `compose.yaml`, `interfaz/main.py`, `verificar_dockerfile.py`, `verificar_imagen.py`, `buscar_secretos.py`, `verificar_stack.py`, `verificar_entrega.py`, `docs/verificacion_cruzada.md` |
 | U3.4 | 2026-11-28 | Pruebas parciales con guardias de contrato, escenarios E2E, bitácora de ajustes, respaldo explícito `503` y registro verificable | `servicio/cadena.py`, `servicio/contratos.py`, `servicio/respaldo.py`, `escenarios.py`, `ejecutar_escenarios.py`, `registrar_ejecucion.py`, `verificar_ejecucion.py`, `verificar_registro.py`, `docs/bitacora_ajustes.md`, `docs/respaldos.md`, `docs/registro_ejecucion.md` |
 | U3.5 | 2026-11-28 | Matrices QA (`MAT-1..MAT-6`), fundamentación mecánica, mitigaciones de seguridad y Matriz de Riesgos verificada (`RIE-1..RIE-6`) | `servicio/fundamentacion.py`, `servicio/seguridad.py`, `matriz_pruebas.py`, `verificar_matriz.py`, `verificar_mitigaciones.py`, `riesgos.py`, `verificar_riesgos.py`, `docs/matriz_pruebas.md`, `docs/registro_alucinaciones.md`, `docs/matriz_riesgos.md` |
+| U3.6 | 2026-11-28 | README técnico completo, prueba en frío, API ejecutable, prueba de transferencia, decisiones y limitaciones | `verificar_readme.py`, `probar_en_frio.py`, `generar_api_md.py`, `verificar_transferencia.py`, `verificar_decisiones.py`, `docs/api.md`, `docs/decisiones.md`, `docs/limitaciones.md`, `docs/prueba_transferencia.md` |
