@@ -19,14 +19,12 @@ if _SRC_DIR not in sys.path:
     sys.path.insert(0, _SRC_DIR)
 
 from observability_security import (  # noqa: E402
-    BLOCKED_QUESTION_REPLY,
-    detect_injection,
     new_trace_id,
     text_fingerprint,
     trace_id_var,
 )
 from rag_corpus import CORPUS  # noqa: E402
-from servicio import cadena, respaldo  # noqa: E402
+from servicio import cadena, respaldo, seguridad  # noqa: E402
 
 logger = logging.getLogger("servicio.logica")
 
@@ -179,14 +177,20 @@ def responder_consulta(pregunta: str) -> dict[str, Any]:
             },
         )
 
-        reglas = detect_injection(pregunta)
-        if reglas:
+        regla = seguridad.detectar_inyeccion(pregunta)
+        if regla:
             logger.warning(
                 "api_inyeccion_bloqueada",
-                extra={"extra_data": {"trace_id": current_trace, "reglas": reglas}},
+                extra={
+                    "extra_data": {
+                        "trace_id": current_trace,
+                        "regla": regla,
+                        "longitud_pregunta": len(pregunta),
+                    }
+                },
             )
             return {
-                "respuesta": BLOCKED_QUESTION_REPLY,
+                "respuesta": seguridad.RECHAZO,
                 "fuentes": [],
                 "trace_id": current_trace,
                 "bloqueada": True,
@@ -209,6 +213,7 @@ def responder_consulta(pregunta: str) -> dict[str, Any]:
             }
 
         respuesta, fuentes = _buscar_en_corpus_local(pregunta)
+        bloqueada = respuesta == seguridad.RECHAZO
         logger.info(
             "api_consulta_respondida",
             extra={
@@ -216,6 +221,7 @@ def responder_consulta(pregunta: str) -> dict[str, Any]:
                     "trace_id": current_trace,
                     "citas": len(fuentes),
                     "longitud_respuesta": len(respuesta),
+                    "bloqueada": bloqueada,
                 }
             },
         )
@@ -223,7 +229,7 @@ def responder_consulta(pregunta: str) -> dict[str, Any]:
             "respuesta": respuesta,
             "fuentes": fuentes,
             "trace_id": current_trace,
-            "bloqueada": False,
+            "bloqueada": bloqueada,
         }
     finally:
         trace_id_var.reset(token)

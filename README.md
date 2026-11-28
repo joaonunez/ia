@@ -67,6 +67,14 @@ Detiene y elimina los contenedores y la red del proyecto sin borrar las imágene
 
 El registro de revisión del despliegue con criterios `VC-1` a `VC-6` y hallazgos está en `docs/verificacion_cruzada.md`.
 
+## Limitaciones conocidas
+
+Todas las limitaciones técnicas verificadas en código están cubiertas y trazadas en `docs/matriz_riesgos.md` (`riesgos.py` / `verificar_riesgos.py`):
+
+- **`MP-08` (paráfrasis sin palabras clave literales en modo simulado):** la recuperación léxica local sin embeddings devuelve `SIN_INFORMACION` ante sinónimos puros (`docs/matriz_modelo.md`). En producción con `USE_LIVE_RAG=true` se mitiga con embeddings en Chroma.
+- **`A-07` (evasión léxica con guiones intercalados):** el filtro de entrada basado en expresiones regulares no reconstruye palabras partidas con guiones (`ataques.py`); se mitiga en profundidad con `limpiar_salida()`, compuerta de fundamentación y modo solo lectura.
+- **`H-04` y `H-05` (afirmaciones cualitativas agregadas y cifras en letras):** la compuerta mecánica `servicio/fundamentacion.py` valida respaldo, fuentes y cifras en dígitos (`docs/registro_alucinaciones.md`), por lo que el riesgo residual `R-03` (`ALTO`) exige validación humana contra la fuente citada antes de emitir avisos formales a apoderados.
+
 ## Avance por unidad
 
 | Unidad | Fecha | Qué | Dónde |
@@ -78,3 +86,4 @@ El registro de revisión del despliegue con criterios `VC-1` a `VC-6` y hallazgo
 | U3.2 | 2026-11-28 | Servicio FastAPI (`servicio/`), validación, errores unificados, cliente externo `httpx2` y evidencia HTTP | `verificar_servicio.py`, `casos.py`, `cliente_externo.py`, `registrar_pruebas.py`, `docs/registro_pruebas.md` |
 | U3.3 | 2026-11-28 | Dockerfiles endurecidos, composición `compose.yaml` (`api` + `interfaz`), secretos y verificación cruzada | `compose.yaml`, `interfaz/main.py`, `verificar_dockerfile.py`, `verificar_imagen.py`, `buscar_secretos.py`, `verificar_stack.py`, `verificar_entrega.py`, `docs/verificacion_cruzada.md` |
 | U3.4 | 2026-11-28 | Pruebas parciales con guardias de contrato, escenarios E2E, bitácora de ajustes, respaldo explícito `503` y registro verificable | `servicio/cadena.py`, `servicio/contratos.py`, `servicio/respaldo.py`, `escenarios.py`, `ejecutar_escenarios.py`, `registrar_ejecucion.py`, `verificar_ejecucion.py`, `verificar_registro.py`, `docs/bitacora_ajustes.md`, `docs/respaldos.md`, `docs/registro_ejecucion.md` |
+| U3.5 | 2026-11-28 | Matrices QA (`MAT-1..MAT-6`), fundamentación mecánica, mitigaciones de seguridad y Matriz de Riesgos verificada (`RIE-1..RIE-6`) | `servicio/fundamentacion.py`, `servicio/seguridad.py`, `matriz_pruebas.py`, `verificar_matriz.py`, `verificar_mitigaciones.py`, `riesgos.py`, `verificar_riesgos.py`, `docs/matriz_pruebas.md`, `docs/registro_alucinaciones.md`, `docs/matriz_riesgos.md` |

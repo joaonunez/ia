@@ -1,13 +1,20 @@
-"""Cadena de 4 componentes desacoplados con guardias de contrato (U3.4 · Bloque 39).
+"""Cadena de 4 componentes desacoplados con guardias de contrato, seguridad y fundamentación.
 
-Componentes:
+Componentes (U3.4 Bloque 39 + U3.5 Bloque 43):
 1. `recuperar(pregunta)` -> lista de fragmentos `{"fuente", "texto"}`
 2. `construir_prompt(pregunta, fragmentos)` -> texto del prompt
 3. `modelo.generar(prompt)` -> texto de respuesta (por defecto `ModeloSimulado`)
 4. `empaquetar(texto, fragmentos)` -> `(texto, fuentes_sin_repetir)`
+
+Defensas integradas en `ejecutar()`:
+- Detección de inyección en entrada (antes de recuperar o invocar modelo).
+- Contrato `list[Fragmento]` antes de filtrar fragmentos sospechosos del corpus.
+- Limpieza de salida (instrucciones internas y secretos).
+- Compuerta mecánica de fundamentación (`problemas_de_respaldo`).
 """
 from __future__ import annotations
 
+import logging
 import sys
 import unicodedata
 from pathlib import Path
@@ -18,7 +25,10 @@ if _SRC_DIR not in sys.path:
     sys.path.insert(0, _SRC_DIR)
 
 from rag_corpus import CORPUS  # noqa: E402
+from servicio import fundamentacion, seguridad  # noqa: E402
 from servicio.contratos import Fragmento, exigir  # noqa: E402
+
+logger = logging.getLogger("servicio.cadena")
 
 SIN_INFORMACION = (
     "No cuento con información suficiente en los documentos indexados para "
@@ -96,6 +106,22 @@ def recuperar(pregunta: str) -> list[dict[str, str]]:
     return [frag for _, frag in candidatos]
 
 
+def sin_fragmentos_sospechosos(fragmentos: list[dict[str, str]]) -> list[dict[str, str]]:
+    """Descarta fragmentos del corpus que contengan patrones de inyección indirecta."""
+    limpios: list[dict[str, str]] = []
+    for fragmento in fragmentos:
+        regla = seguridad.detectar_inyeccion(fragmento["texto"])
+        if regla:
+            logger.warning(
+                "fragmento descartado fuente=%s regla=%s",
+                fragmento["fuente"],
+                regla,
+            )
+            continue
+        limpios.append(fragmento)
+    return limpios
+
+
 def construir_prompt(pregunta: str, fragmentos: list[dict[str, str]]) -> str:
     """Arma el prompt que recibe el modelo usando únicamente el contexto recuperado."""
     contexto = "\n".join(f"- {f['texto']}" for f in fragmentos)
@@ -132,11 +158,23 @@ def empaquetar(texto: str, fragmentos: list[dict[str, str]]) -> tuple[str, list[
 
 
 def ejecutar(pregunta: str, modelo: Any | None = None) -> tuple[str, list[str]]:
-    """Ejecuta la cadena completa verificando los contratos en cada frontera."""
+    """Ejecuta la cadena completa verificando contratos, seguridad y fundamentación."""
+    regla = seguridad.detectar_inyeccion(pregunta)
+    if regla:
+        logger.warning("pregunta rechazada regla=%s longitud=%d", regla, len(pregunta))
+        return seguridad.RECHAZO, []
+
     modelo = modelo or ModeloSimulado()
     fragmentos = recuperar(pregunta)
     exigir(list[Fragmento], fragmentos, "recuperar")
+    fragmentos = sin_fragmentos_sospechosos(fragmentos)
     prompt = construir_prompt(pregunta, fragmentos)
     texto = modelo.generar(prompt)
     exigir(str, texto, "generar")
+    texto = seguridad.limpiar_salida(texto, internos=(INSTRUCCION,))
+    problemas = fundamentacion.problemas_de_respaldo(texto, fragmentos, SIN_INFORMACION)
+    if problemas:
+        codigos = ",".join(codigo for codigo, _ in problemas)
+        logger.warning("respuesta sin respaldo codigos=%s", codigos)
+        return SIN_INFORMACION, []
     return empaquetar(texto, fragmentos)
