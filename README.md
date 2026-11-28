@@ -75,6 +75,7 @@ Suite automatizada sin red ni credenciales externas:
 - Suite completa: `python -m pytest -q`
 - Matriz QA y seguridad: `python verificar_matriz.py`, `python verificar_mitigaciones.py`, `python verificar_riesgos.py`
 - Documentación y transferencia: `python verificar_readme.py`, `python generar_api_md.py --comprobar`, `python verificar_transferencia.py`, `python verificar_decisiones.py`, `python probar_en_frio.py`
+- Defensa y Gate 3: `python medir_guion.py`, `python ensayo_demo.py --comprobar`, `python verificar_gate3.py --escribir` (o `--con-docker --escribir` para generar el veredicto completo en `docs/gate3.md`)
 
 ## Decisiones
 
@@ -94,8 +95,9 @@ Todas las limitaciones técnicas verificadas (`LIM-01`, `LIM-02`, `LIM-03`, `LIM
 
 - `servicio/`: API FastAPI (`servicio/main.py`, `servicio/cadena.py`, `servicio/logica.py`, `servicio/seguridad.py`, `servicio/fundamentacion.py`, `servicio/contratos.py`, `servicio/respaldo.py`, `servicio/errores.py`).
 - `interfaz/`: cliente web ligero (`interfaz/main.py`, `interfaz/Dockerfile`).
-- `docs/`: ficha funcional (`docs/ficha_diseno_funcional.md`), referencia API (`docs/api.md`), decisiones (`docs/decisiones.md`), limitaciones (`docs/limitaciones.md`), matrices (`docs/matriz_pruebas.md`, `docs/matriz_riesgos.md`), transferencia (`docs/prueba_transferencia.md`) y diario (`docs/diario_de_friccion.md`).
+- `docs/`: ficha funcional (`docs/ficha_diseno_funcional.md`), referencia API (`docs/api.md`), decisiones (`docs/decisiones.md`), limitaciones (`docs/limitaciones.md`), matrices (`docs/matriz_pruebas.md`, `docs/matriz_riesgos.md`), transferencia (`docs/prueba_transferencia.md`), diario (`docs/diario_de_friccion.md`), guion (`docs/defensa.md`), respaldo demo (`docs/demo_respaldo.md`) e informe Gate 3 (`docs/gate3.md`).
 - `tests/`: pruebas unitarias y parciales en `tests/parciales/`.
+- Gate 3 en la raíz: `ensayo_demo.py`, `medir_guion.py`, `rubrica_gate3.py`, `verificar_gate3.py`.
 
 ## Cómo detener
 
@@ -129,3 +131,4 @@ El registro de revisión del despliegue con criterios `VC-1` a `VC-6` y hallazgo
 | U3.4 | 2026-11-28 | Pruebas parciales con guardias de contrato, escenarios E2E, bitácora de ajustes, respaldo explícito `503` y registro verificable | `servicio/cadena.py`, `servicio/contratos.py`, `servicio/respaldo.py`, `escenarios.py`, `ejecutar_escenarios.py`, `registrar_ejecucion.py`, `verificar_ejecucion.py`, `verificar_registro.py`, `docs/bitacora_ajustes.md`, `docs/respaldos.md`, `docs/registro_ejecucion.md` |
 | U3.5 | 2026-11-28 | Matrices QA (`MAT-1..MAT-6`), fundamentación mecánica, mitigaciones de seguridad y Matriz de Riesgos verificada (`RIE-1..RIE-6`) | `servicio/fundamentacion.py`, `servicio/seguridad.py`, `matriz_pruebas.py`, `verificar_matriz.py`, `verificar_mitigaciones.py`, `riesgos.py`, `verificar_riesgos.py`, `docs/matriz_pruebas.md`, `docs/registro_alucinaciones.md`, `docs/matriz_riesgos.md` |
 | U3.6 | 2026-11-28 | README técnico completo, prueba en frío, API ejecutable, prueba de transferencia, decisiones y limitaciones | `verificar_readme.py`, `probar_en_frio.py`, `generar_api_md.py`, `verificar_transferencia.py`, `verificar_decisiones.py`, `docs/api.md`, `docs/decisiones.md`, `docs/limitaciones.md`, `docs/prueba_transferencia.md` |
+| U3.7 | 2026-11-28 | Gate 3 / Capstone: guion de defensa, demo ensayada con Plan B, rúbrica ejecutable e informe verificable | `medir_guion.py`, `ensayo_demo.py`, `rubrica_gate3.py`, `verificar_gate3.py`, `docs/defensa.md`, `docs/demo_respaldo.md`, `docs/gate3.md` |
